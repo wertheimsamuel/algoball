@@ -17,6 +17,7 @@ from algoball.model.calibrate import (
     Status,
     evaluate_game,
 )
+from algoball.model.confidence import confidence_index
 from algoball.model.devig import (
     american_to_decimal,
     american_to_implied,
@@ -135,3 +136,40 @@ def test_line_shopping_picks_best_price_and_flags_soft_book():
 
 def test_shop_lines_handles_empty():
     assert shop_lines([]) is None
+
+
+# --- confidence index --------------------------------------------------------
+def test_confidence_rewards_hit_probability_and_edge_quality():
+    strong = confidence_index(
+        pick_prob=0.62,
+        edge_abs=0.06,
+        book_count=8,
+        method_gap=0.001,
+    )
+    thin = confidence_index(
+        pick_prob=0.51,
+        edge_abs=0.016,
+        book_count=2,
+        method_gap=0.006,
+    )
+    assert strong.index > thin.index
+    assert strong.label in {"Medium", "High"}
+
+
+def test_confidence_keeps_value_underdogs_honest():
+    dog = confidence_index(
+        pick_prob=0.38,
+        edge_abs=0.07,
+        book_count=8,
+        method_gap=0.001,
+    )
+    favorite = confidence_index(
+        pick_prob=0.62,
+        edge_abs=0.04,
+        book_count=8,
+        method_gap=0.001,
+    )
+    # An underdog can be a good value edge, but it should not be presented as
+    # more likely to hit than a mathematically stronger favorite.
+    assert dog.index < favorite.index
+    assert dog.label in {"Longshot", "Watch"}

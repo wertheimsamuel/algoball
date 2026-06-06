@@ -73,6 +73,15 @@ def _fmt_edge(edge: Optional[float], signed: bool = False) -> str:
     return ("{:+.1f}%" if signed else "{:.1f}%").format(value)
 
 
+def _fmt_confidence(value: Optional[float]) -> str:
+    if value is None:
+        return "&mdash;"
+    try:
+        return "{} / 100".format(int(round(float(value))))
+    except (TypeError, ValueError):
+        return "&mdash;"
+
+
 def _book_price(book: Any, odds: Optional[float]) -> str:
     """Render a "best price" cell as ``-120 DraftKings`` (price first, then book)."""
     price = _fmt_odds(odds)
@@ -99,11 +108,19 @@ def _edge_card(edge: Dict[str, Any]) -> str:
     market_prob = _fmt_pct(edge.get("market_prob"))
     edge_pct = _fmt_edge(edge.get("edge_pct"), signed=True)
     best = _book_price(edge.get("best_book"), edge.get("best_odds"))
+    conf = _fmt_confidence(edge.get("confidence_index"))
+    conf_label = _esc(edge.get("confidence_label"))
+    conf_note = edge.get("confidence_note")
     note = edge.get("note")
 
     note_html = ""
+    note_parts = []
+    if conf_note:
+        note_parts.append("Confidence: {}".format(_esc(conf_note)))
     if note:
-        note_html = '<p class="card-note">{}</p>'.format(_esc(note))
+        note_parts.append(_esc(note))
+    if note_parts:
+        note_html = '<p class="card-note">{}</p>'.format("<br>".join(note_parts))
 
     return (
         '<article class="edge-card">'
@@ -123,6 +140,8 @@ def _edge_card(edge: Dict[str, Any]) -> str:
         '<span class="v">{market_prob}</span></div>'
         '<div class="cell"><span class="k">Edge</span>'
         '<span class="v edge-val">{edge_pct}</span></div>'
+        '<div class="cell"><span class="k">Confidence</span>'
+        '<span class="v confidence-val">{conf} <span class="sub">{conf_label}</span></span></div>'
         '<div class="cell"><span class="k">Best price</span>'
         '<span class="v">{best}</span></div>'
         "</div>"
@@ -137,6 +156,8 @@ def _edge_card(edge: Dict[str, Any]) -> str:
         model_line=model_line,
         market_prob=market_prob,
         edge_pct=edge_pct,
+        conf=conf,
+        conf_label=conf_label,
         best=best,
         note_html=note_html,
     )
@@ -466,6 +487,7 @@ body {
 }
 .cell .v .sub { color: #8b949e; font-weight: 400; font-size: 13px; }
 .edge-val { color: #3fb950; }
+.confidence-val { color: #f2cc60; }
 .card-note {
   margin: 14px 0 0;
   padding-top: 12px;
