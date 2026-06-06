@@ -34,6 +34,7 @@ from .model.devig import (
 from .model.game import GameInputs, predict_game
 from .model.lineshop import BookLine, shop_lines
 from .render.renderer import render_html
+from .tracker import build_tracker, record_live_suggestions
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _NY = ZoneInfo("America/New_York")
@@ -114,7 +115,15 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
     print(f"[1] {date}: {len(todays)} games on the slate, {len(pregame)} still pre-game.")
 
     if not pregame:
-        ctx = {"date": date, "generated_at": _now_stamp(), "n_games": 0, "n_edges": 0, "edges": [], "games": []}
+        ctx = {
+            "date": date,
+            "generated_at": _now_stamp(),
+            "n_games": 0,
+            "n_edges": 0,
+            "edges": [],
+            "games": [],
+            "tracker": build_tracker(int(date[:4])),
+        }
         _write_outputs(date, ctx)
         return ctx
 
@@ -173,6 +182,7 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
         if pred is None:
             continue
         base = {
+            "date": date, "gamePk": g["gamePk"],
             "away": g["away_name"], "home": g["home_name"],
             "start_local": _start_local(g["commence_utc"]),
             "model_prob": pred.p_home, "model_line": pred.home_line,
@@ -202,6 +212,7 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
         if verdict.status == Status.SURFACED:
             if div > 0:  # edge on home
                 edges_ctx.append({
+                    "date": date, "gamePk": g["gamePk"],
                     "away": g["away_name"], "home": g["home_name"], "side": "home",
                     "start_local": base["start_local"],
                     "model_prob": pred.p_home, "model_line": pred.home_line,
@@ -211,6 +222,7 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
                 })
             else:  # edge on away
                 edges_ctx.append({
+                    "date": date, "gamePk": g["gamePk"],
                     "away": g["away_name"], "home": g["home_name"], "side": "away",
                     "start_local": base["start_local"],
                     "model_prob": 1.0 - pred.p_home, "model_line": pred.away_line,
@@ -225,16 +237,18 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
     diverged_count = len(edges_ctx)
     edges_ctx.sort(key=lambda e: abs(e["edge_pct"]), reverse=True)
     edges_ctx = edges_ctx[:MAX_SURFACED_PER_DAY]
-    kept = {(e["away"], e["home"]) for e in edges_ctx}
+    kept = {e.get("gamePk") for e in edges_ctx}
     for g in games_ctx:
-        if g["status"] == "surfaced" and (g["away"], g["home"]) not in kept:
+        if g["status"] == "surfaced" and g.get("gamePk") not in kept:
             g["status"] = "no_edge"
 
+    record_live_suggestions(date, edges_ctx)
     ctx = {
         "date": date, "generated_at": _now_stamp(),
         "n_games": len(games_ctx), "n_edges": len(edges_ctx),
         "diverged_count": diverged_count,
         "edges": edges_ctx, "games": games_ctx,
+        "tracker": build_tracker(int(date[:4])),
     }
     _write_outputs(date, ctx)
     print(f"[5] {len(games_ctx)} games | model diverged >floor on {diverged_count} | "

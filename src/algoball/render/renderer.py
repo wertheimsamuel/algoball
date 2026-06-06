@@ -80,6 +80,15 @@ def _fmt_edge(edge: Optional[float], signed: bool = False) -> str:
     return ("{:+.1f}%" if signed else "{:.1f}%").format(value)
 
 
+def _fmt_rate(rate: Optional[float]) -> str:
+    if rate is None:
+        return "&mdash;"
+    try:
+        return "{:.1f}%".format(float(rate) * 100.0)
+    except (TypeError, ValueError):
+        return "&mdash;"
+
+
 def _book_price(book: Any, odds: Optional[float]) -> str:
     """Render a "best price" cell as ``-120 DraftKings`` (price first, then book)."""
     price = _fmt_odds(odds)
@@ -163,6 +172,128 @@ def _edges_section(edges: List[Dict[str, Any]], n_edges: int) -> str:
         "{body}"
         "</section>"
     ).format(body=body)
+
+
+def _result_badge(won: Any) -> str:
+    if won is True:
+        return '<span class="result-badge res-win">Win</span>'
+    if won is False:
+        return '<span class="result-badge res-loss">Loss</span>'
+    return '<span class="result-badge res-pending">Pending</span>'
+
+
+def _recent_pick_row(pick: Dict[str, Any]) -> str:
+    matchup = "{} @ {}".format(_esc(pick.get("away")), _esc(pick.get("home")))
+    return (
+        "<tr>"
+        "<td>{date}</td>"
+        "<td>{pick}</td>"
+        "<td>{matchup}</td>"
+        '<td class="num">{edge}</td>'
+        "<td>{result}</td>"
+        "</tr>"
+    ).format(
+        date=_esc(pick.get("date")),
+        pick=_esc(pick.get("pick")),
+        matchup=matchup,
+        edge=_fmt_edge(pick.get("edge_pct"), signed=True),
+        result=_result_badge(pick.get("won")),
+    )
+
+
+def _tracker_section(tracker: Dict[str, Any]) -> str:
+    tracker = tracker or {}
+    current = tracker.get("current") or {}
+    live = tracker.get("live") or {}
+    history = tracker.get("history") or []
+
+    recent = live.get("recent") or []
+    if recent:
+        recent_rows = "".join(_recent_pick_row(p) for p in reversed(recent))
+        recent_html = (
+            '<div class="table-wrap compact">'
+            '<table class="games-table tracker-table">'
+            "<thead><tr><th>Date</th><th>Pick</th><th>Game</th>"
+            '<th class="num">Edge</th><th>Result</th></tr></thead>'
+            f"<tbody>{recent_rows}</tbody></table></div>"
+        )
+    else:
+        recent_html = (
+            '<div class="empty-state small">'
+            '<div class="empty-title">No tracked suggestions yet.</div>'
+            '<div class="empty-sub">The live record starts from saved daily snapshots.</div>'
+            "</div>"
+        )
+
+    history_rows = []
+    for row in history:
+        history_rows.append(
+            "<tr>"
+            "<td>{season}</td>"
+            '<td class="num">{graded}</td>'
+            '<td class="num">{wins}</td>'
+            '<td class="num">{losses}</td>'
+            '<td class="num strong">{rate}</td>'
+            "<td>{period}</td>"
+            "</tr>".format(
+                season=_esc(row.get("season")),
+                graded=_esc(row.get("graded")),
+                wins=_esc(row.get("wins")),
+                losses=_esc(row.get("losses")),
+                rate=_fmt_rate(row.get("win_rate")),
+                period=_esc(row.get("period")),
+            )
+        )
+    history_html = (
+        '<div class="table-wrap compact">'
+        '<table class="games-table tracker-table">'
+        "<thead><tr><th>Season</th><th class=\"num\">Picks</th>"
+        '<th class="num">Wins</th><th class="num">Losses</th>'
+        '<th class="num">Win rate</th><th>Period</th></tr></thead>'
+        "<tbody>{}</tbody></table></div>".format("".join(history_rows))
+        if history_rows
+        else '<div class="empty-state small"><div class="empty-title">No history available.</div></div>'
+    )
+
+    return (
+        '<section class="section tracker-section">'
+        '<h2 class="section-title">Performance Tracker</h2>'
+        '<div class="tracker-tabs">'
+        '<input class="tab-radio" type="radio" name="tracker-tab" id="tab-current" checked>'
+        '<input class="tab-radio" type="radio" name="tracker-tab" id="tab-history">'
+        '<div class="tab-labels">'
+        '<label for="tab-current">Current Season</label>'
+        '<label for="tab-history">Season History</label>'
+        "</div>"
+        '<div class="tab-panels">'
+        '<div class="tab-panel current-panel">'
+        '<div class="tracker-card">'
+        '<div><div class="tracker-kicker">{season} season model tracker</div>'
+        '<div class="tracker-record">{wins}-{losses}</div>'
+        '<div class="tracker-sub">{graded} graded picks &middot; {period}</div></div>'
+        '<div class="tracker-rate"><span>{rate}</span><small>win rate</small></div>'
+        "</div>"
+        '<p class="tracker-note">{basis}. This resets by season automatically. Latest live site suggestions are listed below and move from pending to win/loss once MLB posts final scores.</p>'
+        "{recent_html}"
+        "</div>"
+        '<div class="tab-panel history-panel">'
+        '<p class="tracker-note">Historical table uses the model path back to 2023 and grades the top daily model picks against final MLB results. It does not claim historical Vegas edge because v1 does not include a paid historical odds feed.</p>'
+        "{history_html}"
+        "</div>"
+        "</div>"
+        "</div>"
+        "</section>"
+    ).format(
+        season=_esc(current.get("season") or live.get("season")),
+        wins=_esc(current.get("wins", 0)),
+        losses=_esc(current.get("losses", 0)),
+        graded=_esc(current.get("graded", 0)),
+        period=_esc(current.get("period")),
+        rate=_fmt_rate(current.get("win_rate")),
+        basis=_esc(current.get("basis")),
+        recent_html=recent_html,
+        history_html=history_html,
+    )
 
 
 def _game_row(game: Dict[str, Any]) -> str:
@@ -287,6 +418,7 @@ def render_html(context: dict) -> str:
     game_word = "game" if n_games == 1 else "games"
 
     edges_html = _edges_section(edges, n_edges)
+    tracker_html = _tracker_section(context.get("tracker") or {})
     games_html = _games_section(games)
 
     return (
@@ -314,6 +446,7 @@ def render_html(context: dict) -> str:
         '<div class="risk-notice">{risk_notice}</div>\n'
         "</header>\n"
         "{edges_html}\n"
+        "{tracker_html}\n"
         "{games_html}\n"
         '<footer class="site-footer">'
         "AlgoBall &middot; model-vs-market, measured. Not financial advice."
@@ -332,6 +465,7 @@ def render_html(context: dict) -> str:
         about=html.escape(_ABOUT),
         risk_notice=html.escape(_RISK_NOTICE),
         edges_html=edges_html,
+        tracker_html=tracker_html,
         games_html=games_html,
     )
 
@@ -509,6 +643,125 @@ body {
 }
 .empty-title { font-size: 16px; font-weight: 600; color: #c9d1d9; }
 .empty-sub { margin-top: 6px; font-size: 13.5px; color: #768089; }
+.empty-state.small {
+  padding: 18px 16px;
+  text-align: left;
+}
+
+/* tracker */
+.tracker-tabs {
+  background: #11181d;
+  border: 1px solid #1c2329;
+  border-radius: 12px;
+  padding: 14px;
+}
+.tab-radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.tab-labels {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: #0b0e11;
+  border: 1px solid #1c2329;
+  border-radius: 8px;
+}
+.tab-labels label {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #8b949e;
+}
+#tab-current:checked ~ .tab-labels label[for="tab-current"],
+#tab-history:checked ~ .tab-labels label[for="tab-history"] {
+  background: #11271a;
+  color: #3fb950;
+}
+.tab-panels { margin-top: 16px; }
+.tab-panel { display: none; }
+#tab-current:checked ~ .tab-panels .current-panel,
+#tab-history:checked ~ .tab-panels .history-panel {
+  display: block;
+}
+.tracker-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+.tracker-kicker {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8b949e;
+}
+.tracker-record {
+  margin-top: 2px;
+  font-size: 34px;
+  line-height: 1.05;
+  font-weight: 800;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+.tracker-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #768089;
+}
+.tracker-rate {
+  min-width: 112px;
+  text-align: right;
+}
+.tracker-rate span {
+  display: block;
+  font-size: 28px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #3fb950;
+  font-variant-numeric: tabular-nums;
+}
+.tracker-rate small {
+  display: block;
+  margin-top: 3px;
+  color: #8b949e;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tracker-note {
+  margin: 0 0 14px;
+  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.table-wrap.compact {
+  border-radius: 8px;
+}
+.tracker-table {
+  min-width: 620px;
+}
+.strong {
+  color: #e6edf3;
+  font-weight: 800;
+}
+.result-badge {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.res-win { background: #11271a; color: #3fb950; border-color: #1f6f3a; }
+.res-loss { background: #2a1416; color: #f85149; border-color: #6e2329; }
+.res-pending { background: #161c21; color: #8b949e; border-color: #232a31; }
 
 /* games table */
 .table-wrap {
@@ -591,5 +844,7 @@ body {
   .container { padding: 22px 14px 48px; }
   .brand { font-size: 26px; }
   .edge-grid { grid-template-columns: 1fr; }
+  .tracker-card { align-items: flex-start; flex-direction: column; }
+  .tracker-rate { min-width: 0; text-align: left; }
 }
 """
