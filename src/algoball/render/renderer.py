@@ -29,7 +29,13 @@ _STATUS_META = {
 _ABOUT = (
     "AlgoBall builds its own pre-game MLB moneyline odds, compares them with "
     "Vegas books after removing vig, and highlights only the clearest "
-    "model-vs-market edges. This is analytical content, not betting advice."
+    "model-vs-market edges."
+)
+
+_RISK_NOTICE = (
+    "Not financial advice. Not betting advice. Gambling involves risk, and you "
+    "can lose money. Odds and model outputs are estimates for research and "
+    "entertainment only; never bet more than you can afford to lose."
 )
 
 
@@ -305,11 +311,12 @@ def render_html(context: dict) -> str:
         '<div class="counts">{n_games} {game_word} &middot; '
         '{n_edges} {edge_word}</div>\n'
         '<p class="about">{about}</p>\n'
+        '<div class="risk-notice">{risk_notice}</div>\n'
         "</header>\n"
         "{edges_html}\n"
         "{games_html}\n"
         '<footer class="site-footer">'
-        "AlgoBall &middot; model-vs-market, measured."
+        "AlgoBall &middot; model-vs-market, measured. Not financial advice."
         "</footer>\n"
         "</div>\n"
         "</body>\n"
@@ -323,6 +330,7 @@ def render_html(context: dict) -> str:
         n_edges=n_edges,
         edge_word=edge_word,
         about=html.escape(_ABOUT),
+        risk_notice=html.escape(_RISK_NOTICE),
         edges_html=edges_html,
         games_html=games_html,
     )
@@ -391,6 +399,17 @@ body {
   color: #c9d1d9;
   line-height: 1.55;
   max-width: 820px;
+}
+.risk-notice {
+  margin-top: 14px;
+  max-width: 860px;
+  background: #1f1a10;
+  color: #f2cc60;
+  border: 1px solid #6e5a1f;
+  border-radius: 8px;
+  padding: 11px 13px;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 /* sections */
