@@ -15,16 +15,14 @@ from collections import defaultdict
 from datetime import datetime
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from .config import FIP_REGRESS_IP, LEAGUE_FIP_FALLBACK
 from .ingest.mlb import (
-    get_pitcher_fip,
     get_season_schedule,
     get_team_runs_allowed_per_game,
     get_team_runs_per_game,
 )
 from .ingest.teams import same_team
 from .model.calibrate import MAX_SURFACED_PER_DAY
-from .model.game import GameInputs, predict_game
+from .model.strength import prior_winprob
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _TRACKED_PATH = os.path.join(_PROJECT_ROOT, "data", "tracked_suggestions.json")
@@ -45,15 +43,6 @@ def _record(wins: int, losses: int, pending: int = 0) -> dict:
         "graded": wins + losses,
         "win_rate": _pct(wins, losses),
     }
-
-
-def _regressed_fip(pid: Optional[int], season: int, league_fip: float) -> float:
-    data = get_pitcher_fip(pid, season) if pid else None
-    if not data:
-        return league_fip
-    return (data["ip"] * data["fip"] + FIP_REGRESS_IP * league_fip) / (
-        data["ip"] + FIP_REGRESS_IP
-    )
 
 
 def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dict]:
@@ -82,32 +71,20 @@ def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dic
         return []
     league_rpg = sum(rs.values()) / len(rs)
 
-    fip_cache: Dict[Optional[int], float] = {}
-
-    def fip_for(pid: Optional[int]) -> float:
-        if pid not in fip_cache:
-            fip_cache[pid] = _regressed_fip(pid, feature_season, LEAGUE_FIP_FALLBACK)
-        return fip_cache[pid]
-
     by_date: Dict[str, List[dict]] = defaultdict(list)
     for g in games:
         if g["home_id"] not in rs or g["away_id"] not in rs:
             continue
-        inp = GameInputs(
-            league_rpg=league_rpg,
-            home_rs=rs[g["home_id"]],
-            home_ra=ra.get(g["home_id"], league_rpg),
-            away_rs=rs[g["away_id"]],
-            away_ra=ra.get(g["away_id"], league_rpg),
-            home_starter_fip=fip_for(g["home_sp"]),
-            away_starter_fip=fip_for(g["away_sp"]),
-            venue=g["venue"] or "",
+        p_home = prior_winprob(
+            rs[g["home_id"]],
+            ra.get(g["home_id"], league_rpg),
+            rs[g["away_id"]],
+            ra.get(g["away_id"], league_rpg),
         )
-        pred = predict_game(inp)
-        pick_side = "home" if pred.p_home >= 0.5 else "away"
+        pick_side = "home" if p_home >= 0.5 else "away"
         pick_team = g["home_name"] if pick_side == "home" else g["away_name"]
         won = bool(g["home_won"]) if pick_side == "home" else not bool(g["home_won"])
-        pick_prob = pred.p_home if pick_side == "home" else 1.0 - pred.p_home
+        pick_prob = p_home if pick_side == "home" else 1.0 - p_home
         by_date[g["date"]].append({
             "date": g["date"],
             "gamePk": g["gamePk"],
@@ -116,7 +93,7 @@ def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dic
             "pick": pick_team,
             "side": pick_side,
             "pick_prob": pick_prob,
-            "edge_strength": abs(pred.p_home - 0.5),
+            "edge_strength": abs(p_home - 0.5),
             "won": won,
         })
 
@@ -153,7 +130,7 @@ def historical_summary(start_year: int = 2023, end_year: Optional[int] = None) -
         rows.append(_summarize_picks(
             season,
             picks,
-            basis="Historical model-pick backtest; no historical sportsbook odds feed",
+            basis="Historical team-strength model backtest; no historical sportsbook odds feed",
             end_date=end_date,
         ))
     return rows
