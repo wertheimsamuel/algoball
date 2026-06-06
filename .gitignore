@@ -1,0 +1,22 @@
+# Secrets — NEVER commit
+.env
+
+# Python
+venv/
+.venv/
+__pycache__/
+.pycache/
+*.pyc
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Local data / generated output
+*.db
+*.sqlite3
+data/
+public/index.html
+
+# OS
+.DS_Store

@@ -1,0 +1,12 @@
+# AlgoBall v1 runtime dependencies: none.
+#
+# The daily app is intentionally pure standard library: urllib ingestion,
+# plain-Python modeling, and inline HTML rendering. Install this file only for
+# developer tooling/tests.
+
+# Dev / tests
+pytest>=8.0
+
+# Hosted (Railway) phase only — uncomment when you deploy:
+# psycopg[binary]>=3.1
+# boto3>=1.34

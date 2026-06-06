@@ -1,0 +1,34 @@
+[project]
+name = "algoball"
+version = "0.1.0"
+description = "An MLB model-vs-market measurement system with calibration guardrails and line shopping."
+requires-python = ">=3.9"
+readme = "README.md"
+
+# The v1 runtime is intentionally pure standard library: urllib ingestion,
+# plain-Python modeling, and inline HTML rendering.
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+# Enabled only in the hosted (Railway) phase:
+hosted = [
+    "psycopg[binary]>=3.1",   # Postgres driver
+    "boto3>=1.34",            # S3 / Cloudflare R2 object storage
+]
+
+[project.scripts]
+algoball = "algoball.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
