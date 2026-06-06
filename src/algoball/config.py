@@ -20,10 +20,10 @@ LEAGUE_FIP_FALLBACK: float = 4.10
 FIP_CONSTANT: float = 3.10
 """cFIP in FIP = (13*HR + 3*(BB+HBP) - 2*K)/IP + cFIP (computed ourselves from one API call)."""
 
-PRIOR_BLEND_W: float = 0.50
+PRIOR_BLEND_W: float = 0.60
 """Weight on the prior-season team-strength (Pythagorean) prior when blended with the
 runs model: p_final = (1-W)*p_runs + W*p_prior. Chosen by multi-season backtest
-(2024/2025/2026, 5,324 games) as the robust, net-positive-everywhere value; see
+(2023/2024/2025/2026, 7,757 games) as the robust, net-positive-everywhere value; see
 src/algoball/model/strength.py and scripts/validate_improved.py."""
 
 # --- park factors (run multipliers, 1.0 = neutral), by venue name ---

@@ -43,7 +43,9 @@ def _write_error_page(exc: BaseException) -> None:
     <h1>AlgoBall</h1>
     <p>The dashboard could not refresh. The service is still online, but the
     data pipeline failed.</p>
-    <p><code>{type(exc).__name__}: {str(exc)}</code></p>
+    <p><code>{type(exc).__name__}</code></p>
+    <p>Check the Railway deployment logs for details. Secrets are not rendered
+    into this public page.</p>
   </main>
 </body>
 </html>
