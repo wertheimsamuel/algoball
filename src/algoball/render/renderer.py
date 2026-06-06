@@ -26,9 +26,10 @@ _STATUS_META = {
     "no_market": ("No market", "st-nomkt"),
 }
 
-_DISCLAIMER = (
-    "Analytical content, not betting advice. The model generates its own "
-    "pre-game odds; most nights it finds 0-3 edges, often none - that is correct."
+_ABOUT = (
+    "AlgoBall builds its own pre-game MLB moneyline odds, compares them with "
+    "Vegas books after removing vig, and highlights only the clearest "
+    "model-vs-market edges. This is analytical content, not betting advice."
 )
 
 
@@ -73,15 +74,6 @@ def _fmt_edge(edge: Optional[float], signed: bool = False) -> str:
     return ("{:+.1f}%" if signed else "{:.1f}%").format(value)
 
 
-def _fmt_confidence(value: Optional[float]) -> str:
-    if value is None:
-        return "&mdash;"
-    try:
-        return "{} / 100".format(int(round(float(value))))
-    except (TypeError, ValueError):
-        return "&mdash;"
-
-
 def _book_price(book: Any, odds: Optional[float]) -> str:
     """Render a "best price" cell as ``-120 DraftKings`` (price first, then book)."""
     price = _fmt_odds(odds)
@@ -108,20 +100,6 @@ def _edge_card(edge: Dict[str, Any]) -> str:
     market_prob = _fmt_pct(edge.get("market_prob"))
     edge_pct = _fmt_edge(edge.get("edge_pct"), signed=True)
     best = _book_price(edge.get("best_book"), edge.get("best_odds"))
-    conf = _fmt_confidence(edge.get("confidence_index"))
-    conf_label = _esc(edge.get("confidence_label"))
-    conf_note = edge.get("confidence_note")
-    note = edge.get("note")
-
-    note_html = ""
-    note_parts = []
-    if conf_note:
-        note_parts.append("Confidence: {}".format(_esc(conf_note)))
-    if note:
-        note_parts.append(_esc(note))
-    if note_parts:
-        note_html = '<p class="card-note">{}</p>'.format("<br>".join(note_parts))
-
     return (
         '<article class="edge-card">'
         '<div class="card-top">'
@@ -132,20 +110,19 @@ def _edge_card(edge: Dict[str, Any]) -> str:
         "</div>"
         '<div class="start">{start}</div>'
         "</div>"
-        '<div class="edge-pick">Edge: <strong>{side_label}</strong></div>'
+        '<div class="suggested-label">Suggested bet</div>'
+        '<div class="suggested-bet">Take <strong>{side_label} moneyline</strong></div>'
+        '<div class="suggested-price">Best available: {best}</div>'
         '<div class="card-grid">'
-        '<div class="cell"><span class="k">Model</span>'
+        '<div class="cell"><span class="k">Model win chance</span>'
         '<span class="v">{model_prob} <span class="sub">({model_line})</span></span></div>'
-        '<div class="cell"><span class="k">Market</span>'
+        '<div class="cell"><span class="k">Market chance</span>'
         '<span class="v">{market_prob}</span></div>'
-        '<div class="cell"><span class="k">Edge</span>'
+        '<div class="cell"><span class="k">Model edge</span>'
         '<span class="v edge-val">{edge_pct}</span></div>'
-        '<div class="cell"><span class="k">Confidence</span>'
-        '<span class="v confidence-val">{conf} <span class="sub">{conf_label}</span></span></div>'
         '<div class="cell"><span class="k">Best price</span>'
         '<span class="v">{best}</span></div>'
         "</div>"
-        "{note_html}"
         "</article>"
     ).format(
         away=away,
@@ -156,21 +133,18 @@ def _edge_card(edge: Dict[str, Any]) -> str:
         model_line=model_line,
         market_prob=market_prob,
         edge_pct=edge_pct,
-        conf=conf,
-        conf_label=conf_label,
         best=best,
-        note_html=note_html,
     )
 
 
 def _edges_section(edges: List[Dict[str, Any]], n_edges: int) -> str:
-    """Build the "Tonight's Edges" section (cards or a calm empty state)."""
+    """Build the suggested-bets section (cards or a calm empty state)."""
     if not edges or n_edges == 0:
         body = (
             '<div class="empty-state">'
-            '<div class="empty-title">No qualifying edges tonight.</div>'
-            '<div class="empty-sub">The model agrees with the market - '
-            "that's the honest, common result.</div>"
+            '<div class="empty-title">No suggested bets tonight.</div>'
+            '<div class="empty-sub">The model did not find a big enough '
+            "pre-game moneyline edge. That is a normal result.</div>"
             "</div>"
         )
     else:
@@ -179,7 +153,7 @@ def _edges_section(edges: List[Dict[str, Any]], n_edges: int) -> str:
 
     return (
         '<section class="section">'
-        '<h2 class="section-title">Tonight\'s Edges</h2>'
+        '<h2 class="section-title">Tonight\'s Suggested Bets</h2>'
         "{body}"
         "</section>"
     ).format(body=body)
@@ -264,7 +238,7 @@ def _games_section(games: List[Dict[str, Any]]) -> str:
 
     return (
         '<section class="section">'
-        '<h2 class="section-title">All Games</h2>'
+        '<h2 class="section-title">Full Slate</h2>'
         "{body}"
         "</section>"
     ).format(body=body)
@@ -303,7 +277,7 @@ def render_html(context: dict) -> str:
     edges = context.get("edges") or []
     games = context.get("games") or []
 
-    edge_word = "edge" if n_edges == 1 else "edges"
+    edge_word = "suggested bet" if n_edges == 1 else "suggested bets"
     game_word = "game" if n_games == 1 else "games"
 
     edges_html = _edges_section(edges, n_edges)
@@ -330,12 +304,12 @@ def render_html(context: dict) -> str:
         "Frozen for the day.</div>\n"
         '<div class="counts">{n_games} {game_word} &middot; '
         '{n_edges} {edge_word}</div>\n'
-        '<p class="disclaimer">{disclaimer}</p>\n'
+        '<p class="about">{about}</p>\n'
         "</header>\n"
         "{edges_html}\n"
         "{games_html}\n"
         '<footer class="site-footer">'
-        "AlgoBall &middot; model-vs-market, measured. Not betting advice."
+        "AlgoBall &middot; model-vs-market, measured."
         "</footer>\n"
         "</div>\n"
         "</body>\n"
@@ -348,7 +322,7 @@ def render_html(context: dict) -> str:
         game_word=game_word,
         n_edges=n_edges,
         edge_word=edge_word,
-        disclaimer=html.escape(_DISCLAIMER),
+        about=html.escape(_ABOUT),
         edges_html=edges_html,
         games_html=games_html,
     )
@@ -411,12 +385,12 @@ body {
   color: #8b949e;
   font-variant-numeric: tabular-nums;
 }
-.disclaimer {
+.about {
   margin: 14px 0 0;
-  font-size: 13px;
-  color: #768089;
-  line-height: 1.45;
-  max-width: 760px;
+  font-size: 15px;
+  color: #c9d1d9;
+  line-height: 1.55;
+  max-width: 820px;
 }
 
 /* sections */
@@ -461,14 +435,33 @@ body {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.edge-pick {
-  margin-top: 10px;
-  font-size: 13.5px;
+.suggested-label {
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #3fb950;
+}
+.suggested-bet {
+  margin-top: 2px;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #fff;
+}
+.suggested-bet strong { color: #fff; }
+.suggested-price {
+  margin-top: 8px;
+  font-size: 14px;
   color: #adbac7;
 }
-.edge-pick strong { color: #3fb950; }
+.suggested-price .price {
+  color: #3fb950;
+  font-weight: 800;
+}
 .card-grid {
-  margin-top: 14px;
+  margin-top: 18px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px 14px;
@@ -487,15 +480,6 @@ body {
 }
 .cell .v .sub { color: #8b949e; font-weight: 400; font-size: 13px; }
 .edge-val { color: #3fb950; }
-.confidence-val { color: #f2cc60; }
-.card-note {
-  margin: 14px 0 0;
-  padding-top: 12px;
-  border-top: 1px solid #1c2329;
-  font-size: 12.5px;
-  color: #8b949e;
-}
-
 /* empty state */
 .empty-state {
   background: #11181d;

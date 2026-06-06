@@ -25,7 +25,6 @@ from .ingest.mlb import (
 from .ingest.odds import get_mlb_moneylines
 from .ingest.teams import same_team
 from .model.calibrate import MAX_SURFACED_PER_DAY, Status, evaluate_game
-from .model.confidence import confidence_index
 from .model.devig import (
     DevigResult,
     american_to_implied,
@@ -202,41 +201,21 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
 
         if verdict.status == Status.SURFACED:
             if div > 0:  # edge on home
-                conf = confidence_index(
-                    pick_prob=pred.p_home,
-                    edge_abs=abs(div),
-                    book_count=len(books),
-                    method_gap=consensus.method_gap,
-                    soft_flag=verdict.soft_flag,
-                )
                 edges_ctx.append({
                     "away": g["away_name"], "home": g["home_name"], "side": "home",
                     "start_local": base["start_local"],
                     "model_prob": pred.p_home, "model_line": pred.home_line,
                     "market_prob": consensus.fair_home, "edge_pct": abs(div) * 100.0,
                     "best_book": shop.best_home_book, "best_odds": shop.best_home_odds,
-                    "confidence_index": conf.index,
-                    "confidence_label": conf.label,
-                    "confidence_note": conf.explanation,
                     "note": verdict.reasons[0],
                 })
             else:  # edge on away
-                conf = confidence_index(
-                    pick_prob=1.0 - pred.p_home,
-                    edge_abs=abs(div),
-                    book_count=len(books),
-                    method_gap=consensus.method_gap,
-                    soft_flag=verdict.soft_flag,
-                )
                 edges_ctx.append({
                     "away": g["away_name"], "home": g["home_name"], "side": "away",
                     "start_local": base["start_local"],
                     "model_prob": 1.0 - pred.p_home, "model_line": pred.away_line,
                     "market_prob": consensus.fair_away, "edge_pct": abs(div) * 100.0,
                     "best_book": shop.best_away_book, "best_odds": shop.best_away_odds,
-                    "confidence_index": conf.index,
-                    "confidence_label": conf.label,
-                    "confidence_note": conf.explanation,
                     "note": verdict.reasons[0],
                 })
 
