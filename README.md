@@ -5,6 +5,10 @@ its own win probability for each game, compares that to the betting market's
 moneyline, and surfaces the handful of games (usually 0-3) where it sees a real
 edge. It runs once each morning, pre-game only. There are no servers to babysit.
 
+**Important:** AlgoBall is not financial advice and not betting advice.
+Gambling involves risk, and you can lose money. The model outputs are estimates
+for research and entertainment only; never bet more than you can afford to lose.
+
 ## Running AlgoBall
 
 ### Run it yourself, right now (one command)
