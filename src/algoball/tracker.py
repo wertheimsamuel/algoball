@@ -119,13 +119,12 @@ def historical_summary(start_year: int = 2023, end_year: Optional[int] = None) -
     """Yearly model-pick win rates back to start_year."""
     end_year = end_year or datetime.now().year
     rows: List[dict] = []
-    today = datetime.now().strftime("%Y-%m-%d")
     for season in range(start_year, end_year + 1):
         games = get_season_schedule(season)
         if not games:
             continue
         last_final = max(g["date"] for g in games if g.get("date"))
-        end_date = last_final if season == end_year and last_final < today else None
+        end_date = last_final if season == end_year else None
         picks = _season_model_picks(season, end_date=end_date)
         rows.append(_summarize_picks(
             season,
