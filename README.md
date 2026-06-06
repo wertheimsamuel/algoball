@@ -88,3 +88,24 @@ before the first game starts.** You don't have to run anything by hand. If you
 ever want to force an update, use the **Run workflow** button from step 5. To
 see what it produced on a given day, just open your GitHub Pages URL in a
 browser.
+
+## Running It On Railway
+
+Railway keeps AlgoBall online as a small web service. The service starts,
+generates the latest dashboard, serves `public/index.html`, and refreshes once
+each morning at 10:30 AM ET.
+
+Railway settings:
+
+```
+Start command: PYTHONPATH=src python3 -m algoball.server
+Health check path: /health
+Required variable: ODDS_API_KEY
+Optional variables:
+  ALGOBALL_REFRESH_HOUR_ET=10
+  ALGOBALL_REFRESH_MINUTE_ET=30
+```
+
+The repo includes `Procfile` and `railway.json`, so Railway should detect the
+start command automatically once connected to GitHub. Set `ODDS_API_KEY` in
+Railway's Variables tab; do not commit `.env`.
