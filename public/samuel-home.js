@@ -28,6 +28,14 @@
     });
   }
 
+  function hideNativeHeaderBrand() {
+    document.querySelectorAll("header a, header span, header div").forEach(function (el) {
+      if ((el.textContent || "").trim() === "Samuel Wertheim") {
+        el.style.display = "none";
+      }
+    });
+  }
+
   function addStyles() {
     if (document.getElementById("sw-hub-style")) return;
     var style = document.createElement("style");
@@ -88,7 +96,7 @@
     main.insertAdjacentHTML(
       "afterbegin",
       '<section id="sw-hub"><div class="wrap">' +
-        '<p class="eyebrow">Projects / AI / finance / sports data</p>' +
+        '<p class="eyebrow">AI Projects</p>' +
         "<h1>Hello, I am Sam Wertheim.</h1>" +
         '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn, make things I care about, and become the best version of myself through the work.</p></div>' +
         '<div class="links">' +
@@ -120,18 +128,18 @@
         '<section class="panel" data-panel="about" role="tabpanel">' +
         '<section class="section bio"><div>' +
           '<p class="section-title">About</p>' +
-          '<p>I am a Lehigh business student interested in finance, data, sports, history, and the new ways AI can help people build faster.</p>' +
-          '<p>This site is intentionally simple. I am not trying to make every experiment sound like a startup. I am using AI, code, and curiosity to build things I want to understand better.</p>' +
+          '<p>I am a finance and accounting major from Lehigh University with a deep interest in artificial intelligence, history, and the stock market.</p>' +
+          '<p>I am interning for a venture capital firm focused on research and private investments. This site is where I keep the personal projects I build while learning how to use AI and code in practical ways.</p>' +
           '<p>The point is to get good at the process: research, design, build, test, break, fix, and keep going.</p>' +
         '</div><div class="facts">' +
           '<div class="fact"><strong>School</strong><span>Lehigh University College of Business</span></div>' +
           '<div class="fact"><strong>Focus</strong><span>Finance and Accounting major; History minor</span></div>' +
-          '<div class="fact"><strong>Current work</strong><span>Northwell Health</span></div>' +
-          '<div class="fact"><strong>Interests</strong><span>Markets, baseball analytics, AI coding tools, history</span></div>' +
+          '<div class="fact"><strong>Current work</strong><span>Venture capital research and private investments</span></div>' +
+          '<div class="fact"><strong>Interests</strong><span>Artificial intelligence, history, the stock market, baseball analytics</span></div>' +
         '</div></section>' +
         '<section class="section split">' +
           '<div class="entry"><p class="section-title">Education</p><h3>Lehigh University College of Business</h3><p>Finance and Accounting major with a History minor. Activities include Investment Management Group, Investment Banking Club, AEPI, Scholars of Finance, and Dean\'s List.</p></div>' +
-          '<div class="entry"><p class="section-title">Work</p><h3>Northwell Health</h3><p>Current professional experience listed on LinkedIn. This site connects that business background with hands-on technical building and AI-assisted project work.</p></div>' +
+          '<div class="entry"><p class="section-title">Work</p><h3>Venture Capital Internship</h3><p>Research and private investments work, connected here with hands-on AI-assisted building and personal project development.</p></div>' +
         '</section>' +
         '<section class="section split">' +
           '<div class="entry"><p class="section-title">How I build</p><h3>AI as a real tool</h3><p>I use AI to research, code, debug, organize ideas, and move from a rough thought to a working product faster. The goal is not polish for polish\'s sake. It is learning through finished artifacts.</p></div>' +
@@ -162,7 +170,9 @@
     replaceExact("Samuel Wertheim projects", "Samuel Wertheim");
     replaceExact("Your Site Title", "Samuel Wertheim");
     replaceExact("email@example.com", "wertheimsamuel12123@gmail.com");
+    hideNativeHeaderBrand();
     addStyles();
     renderHub();
+    hideNativeHeaderBrand();
   });
 }());
