@@ -34,7 +34,7 @@ from .model.devig import (
 from .model.game import GameInputs, predict_game
 from .model.lineshop import BookLine, shop_lines
 from .render.renderer import render_html
-from .tracker import build_tracker, record_live_suggestions
+from .tracker import build_tracker, historical_daily_archive, record_live_suggestions
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 _NY = ZoneInfo("America/New_York")
@@ -268,13 +268,18 @@ def _archive_day(snapshot: dict) -> dict:
         "generated_at": snapshot.get("generated_at"),
         "n_edges": int(snapshot.get("n_edges") or 0),
         "edges": snapshot.get("edges") or [],
+        "source": snapshot.get("source") or "live_snapshot",
     }
 
 
 def _build_archive(current_date: str, current_ctx: dict) -> List[dict]:
     """Collect saved daily snapshots for the website's date picker."""
     data_dir = _data_dir()
-    by_date = {}
+    by_date = {
+        day["date"]: day
+        for day in historical_daily_archive(2023, int(current_date[:4]))
+        if day.get("date")
+    }
     if os.path.isdir(data_dir):
         for name in os.listdir(data_dir):
             if not (len(name) == 15 and name.endswith(".json")):

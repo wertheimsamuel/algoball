@@ -13,6 +13,7 @@ import json
 import os
 from collections import defaultdict
 from datetime import datetime
+from functools import lru_cache
 from typing import Dict, Iterable, List, Optional, Tuple
 
 from .ingest.mlb import (
@@ -52,7 +53,8 @@ def _record(wins: int, losses: int, pending: int = 0) -> dict:
     }
 
 
-def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dict]:
+@lru_cache(maxsize=None)
+def _season_model_picks(season: int, end_date: Optional[str] = None) -> Tuple[dict, ...]:
     """Top model picks per date, graded against final scores.
 
     This is a no-odds historical backtest. For each date, rank games by the
@@ -75,7 +77,7 @@ def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dic
         if w:
             ra[tid] = w
     if not rs:
-        return []
+        return tuple()
     league_rpg = sum(rs.values()) / len(rs)
 
     by_date: Dict[str, List[dict]] = defaultdict(list)
@@ -108,7 +110,7 @@ def _season_model_picks(season: int, end_date: Optional[str] = None) -> List[dic
     for date, day_games in sorted(by_date.items()):
         ranked = sorted(day_games, key=lambda r: r["edge_strength"], reverse=True)
         picks.extend(ranked[:MAX_SURFACED_PER_DAY])
-    return picks
+    return tuple(picks)
 
 
 def _summarize_picks(season: int, picks: List[dict], *, basis: str, end_date: Optional[str]) -> dict:
@@ -140,6 +142,48 @@ def historical_summary(start_year: int = 2023, end_year: Optional[int] = None) -
             end_date=end_date,
         ))
     return rows
+
+
+def historical_daily_archive(start_year: int = 2023, end_year: Optional[int] = None) -> List[dict]:
+    """Daily model-pick archive for the website date picker.
+
+    These are historical model picks, not archived sportsbook lines. Real saved
+    live snapshots are still preferred when available.
+    """
+    end_year = end_year or datetime.now().year
+    days: Dict[str, List[dict]] = defaultdict(list)
+    for season in range(start_year, end_year + 1):
+        games = get_season_schedule(season)
+        if not games:
+            continue
+        last_final = max(g["date"] for g in games if g.get("date"))
+        end_date = last_final if season == end_year else None
+        for pick in _season_model_picks(season, end_date=end_date):
+            days[pick["date"]].append({
+                "date": pick["date"],
+                "gamePk": pick.get("gamePk"),
+                "away": pick.get("away"),
+                "home": pick.get("home"),
+                "side": pick.get("side"),
+                "model_prob": pick.get("pick_prob"),
+                "model_line": None,
+                "market_prob": None,
+                "edge_pct": (pick.get("edge_strength") or 0.0) * 100.0,
+                "best_book": None,
+                "best_odds": None,
+                "source": "historical_model",
+            })
+
+    out = []
+    for date, edges in days.items():
+        out.append({
+            "date": date,
+            "generated_at": "historical model backtest",
+            "n_edges": len(edges),
+            "edges": edges,
+            "source": "historical_model",
+        })
+    return sorted(out, key=lambda row: row["date"], reverse=True)
 
 
 def _data_snapshots() -> Iterable[Tuple[str, dict]]:

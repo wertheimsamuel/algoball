@@ -213,12 +213,14 @@ def _archive_payload(archive: List[Dict[str, Any]]) -> str:
                 "edgePct": edge.get("edge_pct"),
                 "bestBook": edge.get("best_book"),
                 "bestOdds": edge.get("best_odds"),
+                "source": edge.get("source") or day.get("source") or "live_snapshot",
             })
         safe.append({
             "date": day.get("date"),
             "generatedAt": day.get("generated_at"),
             "nEdges": int(day.get("n_edges") or len(edges)),
             "edges": edges,
+            "source": day.get("source") or "live_snapshot",
         })
     return json.dumps(safe, separators=(",", ":")).replace("</", "<\\/")
 
@@ -247,8 +249,7 @@ def _archive_section(archive: List[Dict[str, Any]]) -> str:
         '<label class="archive-picker-label" for="archive-date">Choose a day</label>'
         '<select class="archive-picker" id="archive-date">{options}</select>'
         "</div>"
-        '<p class="archive-note">Use this to look back at saved pre-game snapshots. '
-        "Each day shows only the bets the model actually suggested that morning.</p>"
+        '<p class="archive-note">Use this to look back by date. Saved live snapshots show book prices when available; older backfilled dates show historical model picks without archived sportsbook prices.</p>'
         '<div id="archive-summary" class="archive-summary"></div>'
         '<div id="archive-results" class="archive-results"></div>'
         '<script type="application/json" id="archive-data">{payload}</script>'
@@ -573,7 +574,10 @@ _ARCHIVE_SCRIPT = """
       card.className = "archive-card";
       card.appendChild(textEl("div", "archive-date-line", (edge.startLocal || "Pre-game") + " · " + (edge.away || "") + " @ " + (edge.home || "")));
       card.appendChild(textEl("div", "archive-pick", "Take " + (edge.sideTeam || "selected side") + " moneyline"));
-      card.appendChild(textEl("div", "archive-price", "Best available: " + fmtOdds(edge.bestOdds) + (edge.bestBook ? " " + edge.bestBook : "")));
+      var priceText = edge.bestOdds === null || edge.bestOdds === undefined
+        ? "Historical model pick · no archived book price"
+        : "Best available: " + fmtOdds(edge.bestOdds) + (edge.bestBook ? " " + edge.bestBook : "");
+      card.appendChild(textEl("div", "archive-price", priceText));
       var grid = document.createElement("div");
       grid.className = "archive-grid";
       grid.appendChild(metric("Model", fmtPct(edge.modelProb) + " (" + fmtOdds(edge.modelLine) + ")"));
