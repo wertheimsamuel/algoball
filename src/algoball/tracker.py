@@ -25,7 +25,14 @@ from .model.calibrate import MAX_SURFACED_PER_DAY
 from .model.strength import prior_winprob
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-_TRACKED_PATH = os.path.join(_PROJECT_ROOT, "data", "tracked_suggestions.json")
+
+
+def _data_dir() -> str:
+    return os.environ.get("ALGOBALL_DATA_DIR") or os.path.join(_PROJECT_ROOT, "data")
+
+
+def _tracked_path() -> str:
+    return os.path.join(_data_dir(), "tracked_suggestions.json")
 
 
 def _pct(wins: int, losses: int) -> Optional[float]:
@@ -136,7 +143,7 @@ def historical_summary(start_year: int = 2023, end_year: Optional[int] = None) -
 
 
 def _data_snapshots() -> Iterable[Tuple[str, dict]]:
-    data_dir = os.path.join(_PROJECT_ROOT, "data")
+    data_dir = _data_dir()
     if not os.path.isdir(data_dir):
         return []
     out = []
@@ -153,10 +160,11 @@ def _data_snapshots() -> Iterable[Tuple[str, dict]]:
 
 
 def _read_tracked() -> List[dict]:
-    if not os.path.exists(_TRACKED_PATH):
+    path = _tracked_path()
+    if not os.path.exists(path):
         return []
     try:
-        with open(_TRACKED_PATH) as f:
+        with open(path) as f:
             data = json.load(f)
     except (OSError, json.JSONDecodeError):
         return []
@@ -164,8 +172,9 @@ def _read_tracked() -> List[dict]:
 
 
 def _write_tracked(rows: List[dict]) -> None:
-    os.makedirs(os.path.dirname(_TRACKED_PATH), exist_ok=True)
-    with open(_TRACKED_PATH, "w") as f:
+    path = _tracked_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w") as f:
         json.dump(rows, f, indent=2)
 
 

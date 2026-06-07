@@ -42,6 +42,10 @@ _UTC = ZoneInfo("UTC")
 
 
 # --- small helpers ----------------------------------------------------------
+def _data_dir() -> str:
+    return os.environ.get("ALGOBALL_DATA_DIR") or os.path.join(_PROJECT_ROOT, "data")
+
+
 def _et(dt_utc: datetime) -> datetime:
     if dt_utc.tzinfo is None:
         dt_utc = dt_utc.replace(tzinfo=_UTC)
@@ -91,7 +95,7 @@ def _consensus_devig(books: List[dict]) -> DevigResult:
 # --- the run ----------------------------------------------------------------
 def _get_odds(date: str, refresh: bool = False) -> dict:
     """Fetch tonight's moneylines once and cache by date (so re-runs don't burn credits)."""
-    path = os.path.join(_PROJECT_ROOT, "data", "cache", f"odds_{date}.json")
+    path = os.path.join(_data_dir(), "cache", f"odds_{date}.json")
     if os.path.exists(path) and not refresh:
         with open(path) as f:
             return json.load(f)
@@ -269,7 +273,7 @@ def _archive_day(snapshot: dict) -> dict:
 
 def _build_archive(current_date: str, current_ctx: dict) -> List[dict]:
     """Collect saved daily snapshots for the website's date picker."""
-    data_dir = os.path.join(_PROJECT_ROOT, "data")
+    data_dir = _data_dir()
     by_date = {}
     if os.path.isdir(data_dir):
         for name in os.listdir(data_dir):
@@ -291,7 +295,7 @@ def _build_archive(current_date: str, current_ctx: dict) -> List[dict]:
 
 def _write_outputs(date: str, ctx: dict) -> None:
     public_dir = os.path.join(_PROJECT_ROOT, "public")
-    data_dir = os.path.join(_PROJECT_ROOT, "data")
+    data_dir = _data_dir()
     os.makedirs(public_dir, exist_ok=True)
     os.makedirs(data_dir, exist_ok=True)
     with open(os.path.join(public_dir, "index.html"), "w") as f:
