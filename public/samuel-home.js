@@ -94,7 +94,7 @@
       '<section id="sw-hub"><div class="wrap">' +
         '<p class="eyebrow">AI Projects</p>' +
         "<h1>Hello, I am Sam Wertheim.</h1>" +
-        '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn, make things I care about, and become the best version of myself through the work.</p></div>' +
+        '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn.</p></div>' +
         '<div class="links">' +
           '<a class="btn primary" href="https://algoball.samuelwertheim.com/">Open AlgoBall</a>' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
