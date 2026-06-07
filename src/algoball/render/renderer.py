@@ -450,6 +450,14 @@ def render_html(context: dict) -> str:
         "{games_html}\n"
         '<footer class="site-footer">'
         "AlgoBall &middot; model-vs-market, measured. Not financial advice."
+        '<span class="footer-contact">'
+        'Samuel Wertheim &middot; '
+        '<a href="https://www.linkedin.com/in/samuel-wertheim/" '
+        'target="_blank" rel="noopener noreferrer">LinkedIn</a>'
+        " &middot; "
+        '<a href="mailto:wertheimsamuel12123@gmail.com">'
+        "wertheimsamuel12123@gmail.com</a>"
+        "</span>"
         "</footer>\n"
         "</div>\n"
         "</body>\n"
@@ -837,6 +845,19 @@ body {
   font-size: 12.5px;
   color: #5c656e;
   text-align: center;
+}
+.footer-contact {
+  display: block;
+  margin-top: 7px;
+  color: #8b949e;
+}
+.footer-contact a {
+  color: #b6c2cf;
+  text-decoration: none;
+}
+.footer-contact a:hover {
+  color: #e6edf3;
+  text-decoration: underline;
 }
 
 /* mobile */
