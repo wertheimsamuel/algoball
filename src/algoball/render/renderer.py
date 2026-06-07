@@ -13,6 +13,7 @@ can never crash the nightly build.
 from __future__ import annotations
 
 import html
+import json
 from typing import Any, Dict, List, Optional
 
 # --- status presentation -------------------------------------------------
@@ -193,6 +194,73 @@ def _edges_section(edges: List[Dict[str, Any]], n_edges: int) -> str:
     ).format(body=body)
 
 
+def _archive_payload(archive: List[Dict[str, Any]]) -> str:
+    """JSON for the client-side date selector, guarded against script break-out."""
+    safe = []
+    for day in archive:
+        edges = []
+        for edge in day.get("edges") or []:
+            side = edge.get("side")
+            side_team = edge.get(side) if side in ("home", "away") else side
+            edges.append({
+                "away": edge.get("away"),
+                "home": edge.get("home"),
+                "sideTeam": side_team,
+                "startLocal": edge.get("start_local"),
+                "modelProb": edge.get("model_prob"),
+                "modelLine": edge.get("model_line"),
+                "marketProb": edge.get("market_prob"),
+                "edgePct": edge.get("edge_pct"),
+                "bestBook": edge.get("best_book"),
+                "bestOdds": edge.get("best_odds"),
+            })
+        safe.append({
+            "date": day.get("date"),
+            "generatedAt": day.get("generated_at"),
+            "nEdges": int(day.get("n_edges") or len(edges)),
+            "edges": edges,
+        })
+    return json.dumps(safe, separators=(",", ":")).replace("</", "<\\/")
+
+
+def _archive_section(archive: List[Dict[str, Any]]) -> str:
+    if not archive:
+        return ""
+
+    options = []
+    for day in archive:
+        date = _esc(day.get("date"))
+        label = "{} - {} {}".format(
+            day.get("date") or "",
+            int(day.get("n_edges") or 0),
+            "pick" if int(day.get("n_edges") or 0) == 1 else "picks",
+        )
+        options.append('<option value="{date}">{label}</option>'.format(
+            date=date,
+            label=_esc(label),
+        ))
+
+    return (
+        '<section class="section archive-section">'
+        '<div class="section-headline">'
+        '<h2 class="section-title">Past Suggested Bets</h2>'
+        '<label class="archive-picker-label" for="archive-date">Choose a day</label>'
+        '<select class="archive-picker" id="archive-date">{options}</select>'
+        "</div>"
+        '<p class="archive-note">Use this to look back at saved pre-game snapshots. '
+        "Each day shows only the bets the model actually suggested that morning.</p>"
+        '<div id="archive-summary" class="archive-summary"></div>'
+        '<div id="archive-results" class="archive-results"></div>'
+        '<script type="application/json" id="archive-data">{payload}</script>'
+        "<script>{script}</script>"
+        "</section>"
+    ).format(
+        options="".join(options),
+        payload=_archive_payload(archive),
+        script=_ARCHIVE_SCRIPT,
+    )
+
+
 def _tracker_section(tracker: Dict[str, Any]) -> str:
     tracker = tracker or {}
     history = tracker.get("history") or []
@@ -370,6 +438,7 @@ def render_html(context: dict) -> str:
     game_word = "game" if n_games == 1 else "games"
 
     edges_html = _edges_section(edges, n_edges)
+    archive_html = _archive_section(context.get("archive") or [])
     tracker_html = _tracker_section(context.get("tracker") or {})
     games_html = _games_section(games)
 
@@ -399,6 +468,7 @@ def render_html(context: dict) -> str:
         '<div class="personal-note">{personal_note}</div>\n'
         "</header>\n"
         "{edges_html}\n"
+        "{archive_html}\n"
         "{tracker_html}\n"
         "{games_html}\n"
         '<footer class="site-footer">'
@@ -427,12 +497,96 @@ def render_html(context: dict) -> str:
         risk_notice=html.escape(_RISK_NOTICE),
         personal_note=html.escape(_PERSONAL_NOTE),
         edges_html=edges_html,
+        archive_html=archive_html,
         tracker_html=tracker_html,
         games_html=games_html,
     )
 
 
 # --- inline stylesheet ----------------------------------------------------
+
+_ARCHIVE_SCRIPT = """
+(function () {
+  var dataEl = document.getElementById("archive-data");
+  var select = document.getElementById("archive-date");
+  var summary = document.getElementById("archive-summary");
+  var results = document.getElementById("archive-results");
+  if (!dataEl || !select || !summary || !results) return;
+
+  var days = [];
+  try { days = JSON.parse(dataEl.textContent || "[]"); } catch (err) { days = []; }
+
+  function fmtPct(value) {
+    if (value === null || value === undefined || isNaN(Number(value))) return "—";
+    return (Number(value) * 100).toFixed(1) + "%";
+  }
+  function fmtEdge(value) {
+    if (value === null || value === undefined || isNaN(Number(value))) return "—";
+    var n = Number(value);
+    return (n >= 0 ? "+" : "") + n.toFixed(1) + "%";
+  }
+  function fmtOdds(value) {
+    if (value === null || value === undefined || isNaN(Number(value))) return "—";
+    var n = Math.round(Number(value));
+    return n > 0 ? "+" + n : String(n);
+  }
+  function textEl(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    node.textContent = text || "";
+    return node;
+  }
+  function metric(label, value) {
+    var wrap = document.createElement("div");
+    wrap.className = "archive-metric";
+    wrap.appendChild(textEl("span", "archive-metric-label", label));
+    wrap.appendChild(textEl("strong", "", value));
+    return wrap;
+  }
+  function findDay(date) {
+    for (var i = 0; i < days.length; i += 1) {
+      if (days[i].date === date) return days[i];
+    }
+    return days[0] || null;
+  }
+  function render(date) {
+    var day = findDay(date);
+    results.innerHTML = "";
+    if (!day) {
+      summary.textContent = "No saved snapshots yet.";
+      return;
+    }
+    var count = Number(day.nEdges || 0);
+    summary.textContent = day.date + " · " + count + " suggested " +
+      (count === 1 ? "bet" : "bets") +
+      (day.generatedAt ? " · snapshot " + day.generatedAt : "");
+    if (!day.edges || !day.edges.length) {
+      var empty = document.createElement("div");
+      empty.className = "empty-state small";
+      empty.appendChild(textEl("div", "empty-title", "No suggested bets on this day."));
+      empty.appendChild(textEl("div", "empty-sub", "The model did not find a clear enough pre-game edge."));
+      results.appendChild(empty);
+      return;
+    }
+    day.edges.forEach(function (edge) {
+      var card = document.createElement("article");
+      card.className = "archive-card";
+      card.appendChild(textEl("div", "archive-date-line", (edge.startLocal || "Pre-game") + " · " + (edge.away || "") + " @ " + (edge.home || "")));
+      card.appendChild(textEl("div", "archive-pick", "Take " + (edge.sideTeam || "selected side") + " moneyline"));
+      card.appendChild(textEl("div", "archive-price", "Best available: " + fmtOdds(edge.bestOdds) + (edge.bestBook ? " " + edge.bestBook : "")));
+      var grid = document.createElement("div");
+      grid.className = "archive-grid";
+      grid.appendChild(metric("Model", fmtPct(edge.modelProb) + " (" + fmtOdds(edge.modelLine) + ")"));
+      grid.appendChild(metric("Market", fmtPct(edge.marketProb)));
+      grid.appendChild(metric("Edge", fmtEdge(edge.edgePct)));
+      card.appendChild(grid);
+      results.appendChild(card);
+    });
+  }
+  select.addEventListener("change", function () { render(select.value); });
+  render(select.value);
+})();
+"""
 
 _CSS = """
 *, *::before, *::after { box-sizing: border-box; }
@@ -532,6 +686,21 @@ body {
   padding-bottom: 8px;
   border-bottom: 1px solid #1c2329;
 }
+.section-headline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #1c2329;
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+.section-headline .section-title {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
 
 /* edge cards */
 .edge-grid {
@@ -620,6 +789,99 @@ body {
 .empty-state.small {
   padding: 18px 16px;
   text-align: left;
+}
+
+/* archive */
+.archive-section {
+  background: #0d141b;
+  border: 1px solid #1c2b3a;
+  border-radius: 12px;
+  padding: 16px;
+}
+.archive-picker-label {
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.archive-picker {
+  min-width: 210px;
+  border: 1px solid #263746;
+  background: #11181d;
+  color: #e6edf3;
+  border-radius: 8px;
+  padding: 9px 11px;
+  font: inherit;
+  font-size: 14px;
+}
+.archive-note {
+  margin: 0 0 14px;
+  color: #8b949e;
+  font-size: 13.5px;
+}
+.archive-summary {
+  margin-bottom: 12px;
+  color: #c9d1d9;
+  font-size: 14px;
+  font-weight: 700;
+}
+.archive-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.archive-card {
+  background: #11181d;
+  border: 1px solid #1c2329;
+  border-left: 4px solid #58a6ff;
+  border-radius: 10px;
+  padding: 14px;
+}
+.archive-date-line {
+  color: #8b949e;
+  font-size: 12.5px;
+}
+.archive-pick {
+  margin-top: 7px;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1.25;
+  font-weight: 800;
+}
+.archive-price {
+  margin-top: 5px;
+  color: #adbac7;
+  font-size: 13.5px;
+}
+.archive-grid {
+  margin-top: 13px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.archive-metric {
+  min-width: 0;
+  background: #0d141b;
+  border: 1px solid #1c2329;
+  border-radius: 8px;
+  padding: 8px;
+}
+.archive-metric-label {
+  display: block;
+  color: #6e7681;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.archive-metric strong {
+  display: block;
+  margin-top: 2px;
+  color: #e6edf3;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
 }
 
 /* tracker */
@@ -764,5 +1026,7 @@ body {
   .container { padding: 22px 14px 48px; }
   .brand { font-size: 26px; }
   .edge-grid { grid-template-columns: 1fr; }
+  .archive-picker { width: 100%; }
+  .archive-grid { grid-template-columns: 1fr; }
 }
 """

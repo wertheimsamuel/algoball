@@ -124,6 +124,7 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
             "games": [],
             "tracker": build_tracker(int(date[:4])),
         }
+        ctx["archive"] = _build_archive(date, ctx)
         _write_outputs(date, ctx)
         return ctx
 
@@ -250,10 +251,42 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
         "edges": edges_ctx, "games": games_ctx,
         "tracker": build_tracker(int(date[:4])),
     }
+    ctx["archive"] = _build_archive(date, ctx)
     _write_outputs(date, ctx)
     print(f"[5] {len(games_ctx)} games | model diverged >floor on {diverged_count} | "
           f"showing top {len(edges_ctx)} as watchlist.")
     return ctx
+
+
+def _archive_day(snapshot: dict) -> dict:
+    return {
+        "date": snapshot.get("date"),
+        "generated_at": snapshot.get("generated_at"),
+        "n_edges": int(snapshot.get("n_edges") or 0),
+        "edges": snapshot.get("edges") or [],
+    }
+
+
+def _build_archive(current_date: str, current_ctx: dict) -> List[dict]:
+    """Collect saved daily snapshots for the website's date picker."""
+    data_dir = os.path.join(_PROJECT_ROOT, "data")
+    by_date = {}
+    if os.path.isdir(data_dir):
+        for name in os.listdir(data_dir):
+            if not (len(name) == 15 and name.endswith(".json")):
+                continue
+            day = name[:-5]
+            if len(day) != 10 or day[4] != "-" or day[7] != "-":
+                continue
+            try:
+                with open(os.path.join(data_dir, name)) as f:
+                    snapshot = json.load(f)
+            except (OSError, json.JSONDecodeError):
+                continue
+            if snapshot.get("date"):
+                by_date[snapshot["date"]] = _archive_day(snapshot)
+    by_date[current_date] = _archive_day(current_ctx)
+    return [by_date[day] for day in sorted(by_date.keys(), reverse=True)]
 
 
 def _write_outputs(date: str, ctx: dict) -> None:
