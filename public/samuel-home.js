@@ -37,7 +37,7 @@
       "#sw-hub *{box-sizing:border-box}",
       "#sw-hub .wrap{max-width:1080px;margin:0 auto}",
       "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;margin:0 0 18px}",
-      "#sw-hub h1{font-size:clamp(48px,8vw,92px);line-height:.92;margin:0 0 22px;letter-spacing:0;max-width:900px}",
+      "#sw-hub h1{font-size:clamp(34px,5vw,56px);line-height:1.02;margin:0 0 22px;letter-spacing:0;max-width:900px}",
       "#sw-hub .lead{font-size:clamp(18px,2.1vw,24px);line-height:1.42;max-width:760px;margin:0 0 30px;color:#334155}",
       "#sw-hub .welcome{max-width:840px;margin:0 0 34px;border-left:3px solid #2563eb;padding-left:20px}",
       "#sw-hub .welcome p{font-size:18px;line-height:1.64;color:#334155;margin:0}",
@@ -72,7 +72,7 @@
       "#sw-hub .muted{color:#475569}",
       "#sw-hub .contact{border-top:1px solid #dbe4ef;margin-top:10px;padding-top:26px;font-size:15px;color:#334155}",
       "#sw-hub .contact a{color:#111827;text-decoration:underline;text-underline-offset:3px}",
-      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .bio,#sw-hub .split{grid-template-columns:1fr;gap:18px}#sw-hub h1{font-size:48px}#sw-hub .tabs{gap:0}#sw-hub .tab{margin-right:18px}}"
+      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .bio,#sw-hub .split{grid-template-columns:1fr;gap:18px}#sw-hub h1{font-size:36px}#sw-hub .tabs{gap:0}#sw-hub .tab{margin-right:18px}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -89,8 +89,8 @@
       "afterbegin",
       '<section id="sw-hub"><div class="wrap">' +
         '<p class="eyebrow">Projects / AI / finance / sports data</p>' +
-        "<h1>Samuel Wertheim</h1>" +
-        '<div class="welcome"><p>Welcome. I am a Lehigh business student studying finance and accounting with a history minor, currently gaining professional experience at Northwell Health. This site is where I keep the personal projects I am building on my own time: tools, experiments, and ideas that help me get better at using AI, code, and data in practical ways. Some projects are serious, some are just fun, but the point is the same: I like building things I would actually want to use.</p></div>' +
+        "<h1>Hello, I am Samuel Wertheim.</h1>" +
+        '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deeper than others, and some are more shallow or experimental, but all of them come from my own free will and my own free time. I am using this as a place to learn, make things I care about, and become the best version of myself through the process.</p></div>' +
         '<div class="links">' +
           '<a class="btn primary" href="https://algoball.samuelwertheim.com/">Open AlgoBall</a>' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
