@@ -45,7 +45,7 @@
       "#sw-hub *{box-sizing:border-box}",
       "#sw-hub .wrap{max-width:1080px;margin:0 auto}",
       "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;margin:0 0 18px}",
-      "#sw-hub h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(34px,5vw,56px);font-weight:600;line-height:1.04;margin:0 0 22px;letter-spacing:0;max-width:900px;color:#000}",
+      "#sw-hub h1{font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:600;line-height:1.4;margin:0 0 14px;letter-spacing:0;max-width:900px;color:#000}",
       "#sw-hub .lead{font-size:clamp(18px,2.1vw,24px);line-height:1.42;max-width:760px;margin:0 0 30px;color:#334155}",
       "#sw-hub .welcome{max-width:840px;margin:0 0 34px;border-left:3px solid #2563eb;padding-left:20px}",
       "#sw-hub .welcome p{font-size:18px;line-height:1.64;color:#334155;margin:0}",
@@ -59,13 +59,9 @@
       "#sw-hub .panel.active{display:block}",
       "#sw-hub .section{border-top:1px solid #dbe4ef;padding:26px 0}",
       "#sw-hub .section-title{font-size:14px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;color:#2563eb}",
-      "#sw-hub .bio{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(260px,.85fr);gap:34px}",
+      "#sw-hub .bio{max-width:900px}",
       "#sw-hub .bio p,#sw-hub li{font-size:16px;line-height:1.62;color:#334155}",
       "#sw-hub .bio p{margin:0 0 15px}",
-      "#sw-hub .facts{display:grid;gap:14px}",
-      "#sw-hub .fact{background:#eff6ff;border:1px solid #bfdbfe;padding:16px}",
-      "#sw-hub .fact strong{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#475569;margin-bottom:7px}",
-      "#sw-hub .fact span{font-size:16px;color:#111827}",
       "#sw-hub .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:30px}",
       "#sw-hub .entry h3{font-size:22px;margin:0 0 7px}",
       "#sw-hub .entry p{font-size:15.5px;line-height:1.58;color:#334155;margin:0 0 10px}",
@@ -80,7 +76,7 @@
       "#sw-hub .muted{color:#475569}",
       "#sw-hub .contact{border-top:1px solid #dbe4ef;margin-top:10px;padding-top:26px;font-size:15px;color:#334155}",
       "#sw-hub .contact a{color:#111827;text-decoration:underline;text-underline-offset:3px}",
-      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .bio,#sw-hub .split{grid-template-columns:1fr;gap:18px}#sw-hub h1{font-size:36px}#sw-hub .tabs{gap:0}#sw-hub .tab{margin-right:18px}}"
+      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .split{grid-template-columns:1fr;gap:18px}#sw-hub .tabs{gap:0}#sw-hub .tab{margin-right:18px}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -105,10 +101,21 @@
           '<a class="btn" href="mailto:wertheimsamuel12123@gmail.com">Email</a>' +
         "</div>" +
         '<div class="tabs" role="tablist" aria-label="Site sections">' +
-          '<button class="tab active" type="button" data-tab="projects" role="tab" aria-selected="true">Projects</button>' +
-          '<button class="tab" type="button" data-tab="about" role="tab" aria-selected="false">About</button>' +
+          '<button class="tab active" type="button" data-tab="about" role="tab" aria-selected="true">About</button>' +
+          '<button class="tab" type="button" data-tab="projects" role="tab" aria-selected="false">Projects</button>' +
         '</div>' +
-        '<section class="panel active" data-panel="projects" role="tabpanel">' +
+        '<section class="panel active" data-panel="about" role="tabpanel">' +
+        '<section class="section bio">' +
+          '<p class="section-title">About</p>' +
+          '<p>I am a finance and accounting major from Lehigh University with a deep interest in artificial intelligence, history, and the stock market. I am currently interning for a venture capital firm focused on research and private investments, which has pushed me to think more seriously about how ideas become companies, how capital gets allocated, and how technology changes the way people make decisions.</p>' +
+          '<p>This site is a place for the projects I build on my own time. Some are more complete, some are lighter experiments, and some are just me following an idea far enough to see what it can become. The point is not to make every project sound bigger than it is. The point is to keep practicing, keep learning, and keep using AI and code to build things that interest me.</p>' +
+        '</section>' +
+        '<section class="section split">' +
+          '<div class="entry"><p class="section-title">Why AI</p><h3>AI makes building feel wide open</h3><p>AI is incredible because it lowers the distance between having an idea and actually trying it. It helps with research, writing, coding, debugging, planning, and learning new concepts fast enough to keep momentum. Used well, it feels like a force multiplier: one person can explore more, build faster, and turn curiosity into something real.</p></div>' +
+          '<div class="entry"><p class="section-title">Stack so far</p><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data. The stack will keep changing as the projects get better.</p></div>' +
+        '</section>' +
+        '</section>' +
+        '<section class="panel" data-panel="projects" role="tabpanel">' +
         '<article class="project featured">' +
           "<div><h2>AlgoBall</h2>" +
           '<p>Daily MLB betting-market analysis. AlgoBall builds its own pre-game moneyline probabilities, removes sportsbook vig, compares model price against market price, and highlights only the clearest model-vs-market divergences before games start.</p>' +
@@ -125,27 +132,6 @@
           '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
-        '<section class="panel" data-panel="about" role="tabpanel">' +
-        '<section class="section bio"><div>' +
-          '<p class="section-title">About</p>' +
-          '<p>I am a finance and accounting major from Lehigh University with a deep interest in artificial intelligence, history, and the stock market.</p>' +
-          '<p>I am interning for a venture capital firm focused on research and private investments. This site is where I keep the personal projects I build while learning how to use AI and code in practical ways.</p>' +
-          '<p>The point is to get good at the process: research, design, build, test, break, fix, and keep going.</p>' +
-        '</div><div class="facts">' +
-          '<div class="fact"><strong>School</strong><span>Lehigh University College of Business</span></div>' +
-          '<div class="fact"><strong>Focus</strong><span>Finance and Accounting major; History minor</span></div>' +
-          '<div class="fact"><strong>Current work</strong><span>Venture capital research and private investments</span></div>' +
-          '<div class="fact"><strong>Interests</strong><span>Artificial intelligence, history, the stock market, baseball analytics</span></div>' +
-        '</div></section>' +
-        '<section class="section split">' +
-          '<div class="entry"><p class="section-title">Education</p><h3>Lehigh University College of Business</h3><p>Finance and Accounting major with a History minor. Activities include Investment Management Group, Investment Banking Club, AEPI, Scholars of Finance, and Dean\'s List.</p></div>' +
-          '<div class="entry"><p class="section-title">Work</p><h3>Venture Capital Internship</h3><p>Research and private investments work, connected here with hands-on AI-assisted building and personal project development.</p></div>' +
-        '</section>' +
-        '<section class="section split">' +
-          '<div class="entry"><p class="section-title">How I build</p><h3>AI as a real tool</h3><p>I use AI to research, code, debug, organize ideas, and move from a rough thought to a working product faster. The goal is not polish for polish\'s sake. It is learning through finished artifacts.</p></div>' +
-          '<div class="entry"><p class="section-title">Stack so far</p><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data.</p></div>' +
-        '</section>' +
-        '</section>' +
         '<p class="contact">Contact: <a href="mailto:wertheimsamuel12123@gmail.com">wertheimsamuel12123@gmail.com</a> / <a href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>' +
       "</div></section>"
     );
