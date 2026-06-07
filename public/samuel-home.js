@@ -15,6 +15,19 @@
     });
   }
 
+  function removeStrayCodeText() {
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    var nodes = [];
+    while (walker.nextNode()) {
+      if ((walker.currentNode.nodeValue || "").trim() === "script>") {
+        nodes.push(walker.currentNode);
+      }
+    }
+    nodes.forEach(function (node) {
+      node.parentNode.removeChild(node);
+    });
+  }
+
   function addStyles() {
     if (document.getElementById("sw-hub-style")) return;
     var style = document.createElement("style");
@@ -81,6 +94,7 @@
 
   ready(function () {
     document.title = "Samuel Wertheim Projects";
+    removeStrayCodeText();
     replaceExact("Samuel Wertheim projects", "Samuel Wertheim");
     replaceExact("Your Site Title", "Samuel Wertheim");
     replaceExact("email@example.com", "wertheimsamuel12123@gmail.com");
