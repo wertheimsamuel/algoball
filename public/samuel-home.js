@@ -128,8 +128,10 @@
         "</article>" +
         '<article class="project">' +
           '<div><h2>History Heave</h2>' +
-          '<p class="muted">A second project is in progress. The goal is to keep adding projects that are personal, useful, or just fun enough to be worth finishing.</p></div>' +
-          '<div class="tags"><span class="tag">AI-assisted</span><span class="tag">In progress</span><span class="tag">Coming soon</span></div>' +
+          '<p>A history dating game. You are shown a piece of history &mdash; a national flag or a ruler&rsquo;s portrait &mdash; and you &ldquo;heave&rdquo; a guess at when it is from by dragging a range of years. A tighter range scores more when you are right; the whole timeline scores nothing. Easy mode gives the name and context; Hard mode shows only the item.</p>' +
+          '<p class="note">Built on open data from Wikidata and Wikimedia Commons, every image license-checked. Same stack as AlgoBall: Python standard library, vanilla JavaScript, deployed on Railway.</p>' +
+          '<p style="margin-top:16px"><a class="btn" href="https://history-heave-production.up.railway.app/">View live project</a></p></div>' +
+          '<div class="tags"><span class="tag">Python</span><span class="tag">Wikidata</span><span class="tag">Wikimedia Commons</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">History game</span></div>' +
         "</article>" +
         '<article class="project">' +
           '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
