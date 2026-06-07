@@ -90,6 +90,11 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(PUBLIC_DIR), **kwargs)
 
+    def end_headers(self) -> None:
+        if self.path.startswith("/samuel-home.js"):
+            self.send_header("Cache-Control", "no-store, max-age=0")
+        super().end_headers()
+
     def do_GET(self):  # noqa: N802 - stdlib hook
         if self.path == "/health":
             self.send_response(200)

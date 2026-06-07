@@ -85,7 +85,11 @@
     var path = window.location.pathname.replace(/\/$/, "") || "/";
     if (path !== "/" && path !== "/home") return;
     var main = document.querySelector("main") || document.querySelector('[role="main"]');
-    if (!main || document.getElementById("sw-hub")) return;
+    if (!main) return;
+    var existingHub = document.getElementById("sw-hub");
+    if (existingHub) {
+      existingHub.parentNode.removeChild(existingHub);
+    }
     Array.prototype.forEach.call(main.children, function (child) {
       child.style.display = "none";
     });
