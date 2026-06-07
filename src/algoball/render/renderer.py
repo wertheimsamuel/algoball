@@ -109,6 +109,19 @@ def _fmt_rate(rate: Optional[float]) -> str:
         return "&mdash;"
 
 
+def _fmt_money(value: Optional[float], signed: bool = False) -> str:
+    if value is None:
+        return "&mdash;"
+    try:
+        amount = float(value)
+    except (TypeError, ValueError):
+        return "&mdash;"
+    if amount < 0:
+        return "-${:,.2f}".format(abs(amount))
+    sign = "+" if signed and amount > 0 else ""
+    return "{}${:,.2f}".format(sign, amount)
+
+
 def _book_price(book: Any, odds: Optional[float]) -> str:
     """Render a "best price" cell as ``-120 DraftKings`` (price first, then book)."""
     price = _fmt_odds(odds)
@@ -117,6 +130,14 @@ def _book_price(book: Any, odds: Optional[float]) -> str:
             price, _esc(book)
         )
     return '<span class="price">{}</span>'.format(price)
+
+
+def _pick_result(won: Any) -> str:
+    if won is True:
+        return '<span class="result-badge res-win">Win</span>'
+    if won is False:
+        return '<span class="result-badge res-loss">Loss</span>'
+    return '<span class="result-badge res-pending">Pending</span>'
 
 
 # --- section builders -----------------------------------------------------
@@ -259,6 +280,86 @@ def _archive_section(archive: List[Dict[str, Any]]) -> str:
         options="".join(options),
         payload=_archive_payload(archive),
         script=_ARCHIVE_SCRIPT,
+    )
+
+
+def _bankroll_row(pick: Dict[str, Any]) -> str:
+    matchup = "{} @ {}".format(_esc(pick.get("away")), _esc(pick.get("home")))
+    profit = pick.get("profit")
+    profit_cls = "profit-pos" if profit and float(profit) > 0 else "profit-neg" if profit and float(profit) < 0 else ""
+    return (
+        "<tr>"
+        "<td>{date}</td>"
+        "<td>{pick}</td>"
+        "<td>{matchup}</td>"
+        '<td class="num">{odds}</td>'
+        '<td class="num">{stake}</td>'
+        '<td>{result}</td>'
+        '<td class="num {profit_cls}">{profit}</td>'
+        "</tr>"
+    ).format(
+        date=_esc(pick.get("date")),
+        pick=_esc(pick.get("pick")),
+        matchup=matchup,
+        odds=_fmt_odds(pick.get("best_odds")),
+        stake=_fmt_money(pick.get("stake")),
+        result=_pick_result(pick.get("won")),
+        profit_cls=profit_cls,
+        profit=_fmt_money(profit, signed=True) if profit is not None else "&mdash;",
+    )
+
+
+def _bankroll_section(tracker: Dict[str, Any]) -> str:
+    bankroll = (tracker or {}).get("bankroll") or {}
+    if not bankroll:
+        return ""
+
+    bets = bankroll.get("bets") or bankroll.get("recent") or []
+    if bets:
+        rows = "".join(_bankroll_row(p) for p in reversed(bets))
+        recent_html = (
+            '<div class="table-wrap compact">'
+            '<table class="games-table bankroll-table">'
+            "<thead><tr><th>Date</th><th>Pick</th><th>Game</th>"
+            '<th class="num">Odds</th><th class="num">Stake</th>'
+            '<th>Result</th><th class="num">Fake P/L</th></tr></thead>'
+            f"<tbody>{rows}</tbody></table></div>"
+        )
+    else:
+        recent_html = (
+            '<div class="empty-state small">'
+            '<div class="empty-title">No fake bets tracked yet.</div>'
+            '<div class="empty-sub">The tracker starts once AlgoBall saves suggested bets with book prices.</div>'
+            "</div>"
+        )
+
+    profit = bankroll.get("profit")
+    profit_class = "bankroll-good" if profit and float(profit) > 0 else "bankroll-bad" if profit and float(profit) < 0 else ""
+    return (
+        '<section class="section bankroll-section">'
+        '<div class="section-headline">'
+        '<h2 class="section-title">Fake Money Tracker</h2>'
+        '<div class="bankroll-stake">$10 fake bet per suggested pick</div>'
+        "</div>"
+        '<div class="bankroll-grid">'
+        '<div class="bankroll-stat primary"><span>Net fake profit</span><strong class="{profit_class}">{profit}</strong></div>'
+        '<div class="bankroll-stat"><span>Total fake staked</span><strong>{staked}</strong></div>'
+        '<div class="bankroll-stat"><span>Record</span><strong>{wins}-{losses}</strong></div>'
+        '<div class="bankroll-stat"><span>ROI</span><strong>{roi}</strong></div>'
+        '<div class="bankroll-stat"><span>Pending bets</span><strong>{pending}</strong></div>'
+        "</div>"
+        '<p class="bankroll-note">This is not real money and not betting advice. It grades every saved AlgoBall suggestion this season as if a $10 fake stake was placed at the displayed best American odds.</p>'
+        "{recent_html}"
+        "</section>"
+    ).format(
+        profit_class=profit_class,
+        profit=_fmt_money(profit, signed=True),
+        staked=_fmt_money(bankroll.get("total_staked")),
+        wins=_esc(bankroll.get("wins", 0)),
+        losses=_esc(bankroll.get("losses", 0)),
+        roi=_fmt_rate(bankroll.get("roi")),
+        pending=_esc(bankroll.get("pending_bets", 0)),
+        recent_html=recent_html,
     )
 
 
@@ -440,7 +541,9 @@ def render_html(context: dict) -> str:
 
     edges_html = _edges_section(edges, n_edges)
     archive_html = _archive_section(context.get("archive") or [])
-    tracker_html = _tracker_section(context.get("tracker") or {})
+    tracker = context.get("tracker") or {}
+    bankroll_html = _bankroll_section(tracker)
+    tracker_html = _tracker_section(tracker)
     games_html = _games_section(games)
 
     return (
@@ -469,6 +572,7 @@ def render_html(context: dict) -> str:
         '<div class="personal-note">{personal_note}</div>\n'
         "</header>\n"
         "{edges_html}\n"
+        "{bankroll_html}\n"
         "{archive_html}\n"
         "{tracker_html}\n"
         "{games_html}\n"
@@ -498,6 +602,7 @@ def render_html(context: dict) -> str:
         risk_notice=html.escape(_RISK_NOTICE),
         personal_note=html.escape(_PERSONAL_NOTE),
         edges_html=edges_html,
+        bankroll_html=bankroll_html,
         archive_html=archive_html,
         tracker_html=tracker_html,
         games_html=games_html,
@@ -795,6 +900,68 @@ body {
   text-align: left;
 }
 
+/* fake money tracker */
+.bankroll-section {
+  background: #11181d;
+  border: 1px solid #1f6f3a;
+  border-radius: 12px;
+  padding: 16px;
+}
+.bankroll-stake {
+  color: #3fb950;
+  font-size: 13px;
+  font-weight: 800;
+}
+.bankroll-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+}
+.bankroll-stat {
+  background: #0d141b;
+  border: 1px solid #1c2329;
+  border-radius: 10px;
+  padding: 12px;
+}
+.bankroll-stat.primary {
+  border-color: #1f6f3a;
+}
+.bankroll-stat span {
+  display: block;
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.bankroll-stat strong {
+  display: block;
+  margin-top: 4px;
+  color: #e6edf3;
+  font-size: 22px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.bankroll-good,
+.profit-pos {
+  color: #3fb950 !important;
+  font-weight: 800;
+}
+.bankroll-bad,
+.profit-neg {
+  color: #f85149 !important;
+  font-weight: 800;
+}
+.bankroll-note {
+  margin: 13px 0 14px;
+  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.bankroll-table {
+  min-width: 760px;
+}
+
 /* archive */
 .archive-section {
   background: #0d141b;
@@ -1030,6 +1197,7 @@ body {
   .container { padding: 22px 14px 48px; }
   .brand { font-size: 26px; }
   .edge-grid { grid-template-columns: 1fr; }
+  .bankroll-grid { grid-template-columns: 1fr 1fr; }
   .archive-picker { width: 100%; }
   .archive-grid { grid-template-columns: 1fr; }
 }

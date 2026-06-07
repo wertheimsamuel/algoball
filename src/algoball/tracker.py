@@ -53,6 +53,24 @@ def _record(wins: int, losses: int, pending: int = 0) -> dict:
     }
 
 
+def _profit_for_american_odds(odds: Optional[float], stake: float, won: Optional[bool]) -> Optional[float]:
+    if won is None:
+        return None
+    if odds is None:
+        return None
+    try:
+        price = float(odds)
+    except (TypeError, ValueError):
+        return None
+    if won is False:
+        return -stake
+    if price > 0:
+        return stake * (price / 100.0)
+    if price < 0:
+        return stake * (100.0 / abs(price))
+    return None
+
+
 @lru_cache(maxsize=None)
 def _season_model_picks(season: int, end_date: Optional[str] = None) -> Tuple[dict, ...]:
     """Top model picks per date, graded against final scores.
@@ -330,6 +348,70 @@ def live_suggestions_summary(current_year: Optional[int] = None) -> dict:
     }
 
 
+def fake_money_tracker(current_year: Optional[int] = None, stake: float = 10.0) -> dict:
+    """Track a fake fixed-stake bankroll on actual saved AlgoBall suggestions."""
+    current_year = current_year or datetime.now().year
+
+    # Build the full current-year set from the same saved live records used by
+    # the performance tracker.
+    schedule_by_year: Dict[int, List[dict]] = {}
+    picks_by_key: Dict[str, dict] = {}
+    for row in _read_tracked():
+        if not row.get("date") or int(str(row["date"])[:4]) != current_year:
+            continue
+        picks_by_key[_pick_key(row)] = dict(row)
+    for date, snapshot in _data_snapshots():
+        if int(date[:4]) != current_year:
+            continue
+        for edge in snapshot.get("edges", []) or []:
+            pick_side = edge.get("side")
+            pick_team = edge.get(pick_side) if pick_side in ("home", "away") else None
+            row = {
+                "date": date,
+                "gamePk": edge.get("gamePk"),
+                "away": edge.get("away"),
+                "home": edge.get("home"),
+                "pick": pick_team,
+                "side": pick_side,
+                "best_odds": edge.get("best_odds"),
+                "edge_pct": edge.get("edge_pct"),
+            }
+            picks_by_key.setdefault(_pick_key(row), row)
+
+    picks = []
+    for row in sorted(picks_by_key.values(), key=lambda r: (r.get("date") or "", str(r.get("gamePk") or ""))):
+        final = _find_final_game(row.get("date", ""), row, schedule_by_year)
+        won = None
+        if final and row.get("side") in ("home", "away"):
+            won = bool(final["home_won"]) if row["side"] == "home" else not bool(final["home_won"])
+        profit = _profit_for_american_odds(row.get("best_odds"), stake, won)
+        picks.append({**row, "won": won, "stake": stake, "profit": profit})
+
+    settled = [p for p in picks if p.get("profit") is not None]
+    pending = [p for p in picks if p.get("won") is None]
+    wins = sum(1 for p in settled if p.get("won") is True)
+    losses = sum(1 for p in settled if p.get("won") is False)
+    total_profit = sum(float(p["profit"]) for p in settled)
+    total_staked = len(picks) * stake
+    settled_staked = len(settled) * stake
+    return {
+        "season": current_year,
+        "stake": stake,
+        "total_bets": len(picks),
+        "settled_bets": len(settled),
+        "pending_bets": len(pending),
+        "wins": wins,
+        "losses": losses,
+        "win_rate": _pct(wins, losses),
+        "total_staked": total_staked,
+        "settled_staked": settled_staked,
+        "profit": total_profit,
+        "roi": (total_profit / settled_staked) if settled_staked else None,
+        "bets": picks,
+        "recent": picks[-12:],
+    }
+
+
 def build_tracker(current_year: Optional[int] = None) -> dict:
     current_year = current_year or datetime.now().year
     history = historical_summary(2023, current_year)
@@ -337,5 +419,6 @@ def build_tracker(current_year: Optional[int] = None) -> dict:
     return {
         "current": current,
         "live": live_suggestions_summary(current_year),
+        "bankroll": fake_money_tracker(current_year),
         "history": history,
     }
