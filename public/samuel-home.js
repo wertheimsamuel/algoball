@@ -39,6 +39,8 @@
       "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;margin:0 0 18px}",
       "#sw-hub h1{font-size:clamp(48px,8vw,92px);line-height:.92;margin:0 0 22px;letter-spacing:0;max-width:900px}",
       "#sw-hub .lead{font-size:clamp(18px,2.1vw,24px);line-height:1.42;max-width:760px;margin:0 0 30px;color:#334155}",
+      "#sw-hub .welcome{max-width:840px;margin:0 0 34px;border-left:3px solid #2563eb;padding-left:20px}",
+      "#sw-hub .welcome p{font-size:18px;line-height:1.64;color:#334155;margin:0}",
       "#sw-hub .links{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 42px}",
       "#sw-hub a.btn{border:1px solid #111827;color:#111827;text-decoration:none;padding:13px 17px;font-size:14px;font-weight:600;display:inline-flex}",
       "#sw-hub a.primary{background:#111827;color:#fff}",
@@ -88,7 +90,7 @@
       '<section id="sw-hub"><div class="wrap">' +
         '<p class="eyebrow">Projects / AI / finance / sports data</p>' +
         "<h1>Samuel Wertheim</h1>" +
-        '<p class="lead">I use AI and code to build things I actually want to use: market tools, sports models, small experiments, and whatever idea keeps pulling me back.</p>' +
+        '<div class="welcome"><p>Welcome. I am a Lehigh business student studying finance and accounting with a history minor, currently gaining professional experience at Northwell Health. This site is where I keep the personal projects I am building on my own time: tools, experiments, and ideas that help me get better at using AI, code, and data in practical ways. Some projects are serious, some are just fun, but the point is the same: I like building things I would actually want to use.</p></div>' +
         '<div class="links">' +
           '<a class="btn primary" href="https://algoball.samuelwertheim.com/">Open AlgoBall</a>' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
