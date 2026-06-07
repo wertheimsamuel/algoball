@@ -99,7 +99,6 @@
         "<h1>Hello, I&rsquo;m Sam Wertheim.</h1>" +
         '<div class="welcome"><p>I created this site to showcase what I have been building with AI. This is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn.</p></div>' +
         '<div class="links">' +
-          '<a class="btn primary" href="https://algoball.samuelwertheim.com/">Open AlgoBall</a>' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
           '<a class="btn" href="mailto:wertheimsamuel12123@gmail.com">Email</a>' +
         "</div>" +
