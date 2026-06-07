@@ -133,6 +133,12 @@
           '<div class="tags"><span class="tag">Python</span><span class="tag">Wikidata</span><span class="tag">Wikimedia Commons</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">History game</span></div>' +
         "</article>" +
         '<article class="project">' +
+          '<div><h2>Freedom Tell</h2>' +
+          '<p>A new project in progress. Freedom Tell is where I am starting to explore how AI can help organize ideas, explain complex topics clearly, and turn research into something easier to understand and share.</p>' +
+          '<p class="note">Still early, but it fits the same purpose as the rest of this site: using AI to build things I am curious about and learning by actually making them.</p></div>' +
+          '<div class="tags"><span class="tag">Work in progress</span><span class="tag">AI</span><span class="tag">Research</span><span class="tag">Writing</span><span class="tag">Personal project</span></div>' +
+        "</article>" +
+        '<article class="project">' +
           '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
