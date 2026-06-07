@@ -37,7 +37,7 @@
       "#sw-hub *{box-sizing:border-box}",
       "#sw-hub .wrap{max-width:1080px;margin:0 auto}",
       "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;margin:0 0 18px}",
-      "#sw-hub h1{font-size:clamp(34px,5vw,56px);line-height:1.02;margin:0 0 22px;letter-spacing:0;max-width:900px}",
+      "#sw-hub h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(34px,5vw,56px);font-weight:600;line-height:1.04;margin:0 0 22px;letter-spacing:0;max-width:900px;color:#000}",
       "#sw-hub .lead{font-size:clamp(18px,2.1vw,24px);line-height:1.42;max-width:760px;margin:0 0 30px;color:#334155}",
       "#sw-hub .welcome{max-width:840px;margin:0 0 34px;border-left:3px solid #2563eb;padding-left:20px}",
       "#sw-hub .welcome p{font-size:18px;line-height:1.64;color:#334155;margin:0}",
@@ -90,7 +90,7 @@
       '<section id="sw-hub"><div class="wrap">' +
         '<p class="eyebrow">Projects / AI / finance / sports data</p>' +
         "<h1>Hello, I am Samuel Wertheim.</h1>" +
-        '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deeper than others, and some are more shallow or experimental, but all of them come from my own free will and my own free time. I am using this as a place to learn, make things I care about, and become the best version of myself through the process.</p></div>' +
+        '<div class="welcome"><p>This site is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn, make things I care about, and become the best version of myself through the work.</p></div>' +
         '<div class="links">' +
           '<a class="btn primary" href="https://algoball.samuelwertheim.com/">Open AlgoBall</a>' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
@@ -109,7 +109,7 @@
           '<div class="tags"><span class="tag">Python</span><span class="tag">MLB Stats API</span><span class="tag">Odds API</span><span class="tag">Railway</span><span class="tag">Daily refresh</span><span class="tag">Sports analytics</span></div>' +
         "</article>" +
         '<article class="project">' +
-          '<div><h2>Next Build</h2>' +
+          '<div><h2>History Heave</h2>' +
           '<p class="muted">A second project is in progress. The goal is to keep adding projects that are personal, useful, or just fun enough to be worth finishing.</p></div>' +
           '<div class="tags"><span class="tag">AI-assisted</span><span class="tag">In progress</span><span class="tag">Coming soon</span></div>' +
         "</article>" +
