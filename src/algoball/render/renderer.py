@@ -38,6 +38,21 @@ _RISK_NOTICE = (
     "entertainment only; never bet more than you can afford to lose."
 )
 
+_PERSONAL_NOTE = (
+    "This is an AI project of mine. Baseball has always been one of my favorite "
+    "sports because of how much lives inside every pitch: the numbers, the "
+    "mechanics, the timing, the pitch type, the spin, the velocity, and the tiny "
+    "margin between a perfect swing and a miss. A pitch can be a fastball, "
+    "slider, changeup, curveball, or knuckleball, moving anywhere from the mid-80s "
+    "to 100 mph, and the hitter still has to solve it in real time. Stats like "
+    "slugging and OPS, and the Moneyball idea that numbers can reveal hidden "
+    "value, lit a fire in me. I wanted to build an algorithm that tries to find "
+    "edges against the house, but I never had the coding ability to do it at this "
+    "level before. AI gave me that ability. AlgoBall is the product of that: an "
+    "AI-assisted baseball model that creates its own pre-game odds and compares "
+    "them against the market."
+)
+
 
 # --- small formatting helpers --------------------------------------------
 
@@ -358,6 +373,16 @@ def _games_section(games: List[Dict[str, Any]]) -> str:
         body = (
             '<div class="table-wrap">'
             '<table class="games-table">'
+            "<colgroup>"
+            '<col class="col-matchup">'
+            '<col class="col-model-pct">'
+            '<col class="col-model-line">'
+            '<col class="col-market-pct">'
+            '<col class="col-edge">'
+            '<col class="col-status">'
+            '<col class="col-best-away">'
+            '<col class="col-best-home">'
+            "</colgroup>"
             "<thead><tr>"
             "<th>Matchup</th>"
             '<th class="num">Model %</th>'
@@ -444,6 +469,7 @@ def render_html(context: dict) -> str:
         '{n_edges} {edge_word}</div>\n'
         '<p class="about">{about}</p>\n'
         '<div class="risk-notice">{risk_notice}</div>\n'
+        '<div class="personal-note">{personal_note}</div>\n'
         "</header>\n"
         "{edges_html}\n"
         "{tracker_html}\n"
@@ -472,6 +498,7 @@ def render_html(context: dict) -> str:
         edge_word=edge_word,
         about=html.escape(_ABOUT),
         risk_notice=html.escape(_RISK_NOTICE),
+        personal_note=html.escape(_PERSONAL_NOTE),
         edges_html=edges_html,
         tracker_html=tracker_html,
         games_html=games_html,
@@ -552,6 +579,18 @@ body {
   padding: 11px 13px;
   font-size: 13px;
   line-height: 1.45;
+}
+.personal-note {
+  margin-top: 16px;
+  max-width: 900px;
+  padding: 16px 18px;
+  border: 1px solid #1c2b3a;
+  border-left: 3px solid #58a6ff;
+  border-radius: 8px;
+  background: #0d141b;
+  color: #b6c2cf;
+  font-size: 14px;
+  line-height: 1.65;
 }
 
 /* sections */
@@ -781,8 +820,17 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 13.5px;
-  min-width: 720px;
+  min-width: 880px;
+  table-layout: fixed;
 }
+.col-matchup { width: 24%; }
+.col-model-pct { width: 10%; }
+.col-model-line { width: 11%; }
+.col-market-pct { width: 10%; }
+.col-edge { width: 9%; }
+.col-status { width: 13%; }
+.col-best-away { width: 11.5%; }
+.col-best-home { width: 11.5%; }
 .games-table thead th {
   text-align: left;
   font-size: 11px;
@@ -802,6 +850,10 @@ body {
 }
 .games-table tbody tr:last-child td { border-bottom: none; }
 .games-table tbody tr:hover { background: #0f1519; }
+.games-table th.num,
+.games-table td.num {
+  text-align: right;
+}
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .matchup-cell { min-width: 180px; }
 .row-home { color: #fff; font-weight: 600; }
@@ -815,7 +867,7 @@ body {
 }
 .edge-cell { color: #8b949e; }
 .edge-pos { color: #3fb950; font-weight: 700; }
-.best-cell { white-space: nowrap; }
+.best-cell { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .best-cell .price { font-variant-numeric: tabular-nums; color: #e6edf3; font-weight: 600; }
 .best-cell .book { color: #768089; font-size: 12px; }
 .price { font-variant-numeric: tabular-nums; }
