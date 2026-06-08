@@ -97,7 +97,7 @@
       "afterbegin",
       '<section id="sw-hub"><div class="wrap">' +
         "<h1>Hello, I&rsquo;m Sam Wertheim.</h1>" +
-        '<div class="welcome"><p>I created this site to showcase what I have been building with AI. This is purely for fun, engagement, and practice with AI so I can keep getting better at building things. Some projects go deep while some may be more shallow, but all of them are built on my own time because I enjoy the process. I am using this as a place to learn.</p></div>' +
+        '<div class="welcome"><p>I created this site to showcase the projects I am building with AI. I am a finance and accounting major at Lehigh University with interests in artificial intelligence, history, and the stock market, and I am currently interning for a venture capital firm focused on research and private investments. This site is not meant to make every project sound bigger than it is. Some ideas go deep, some stay lighter, but all of them are built on my own time because I enjoy learning by making things.</p></div>' +
         '<div class="links">' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
           '<a class="btn" href="mailto:wertheimsamuel12123@gmail.com">Email</a>' +
@@ -109,11 +109,10 @@
         '<section class="panel active" data-panel="about" role="tabpanel">' +
         '<section class="section bio">' +
           '<p class="section-title">About</p>' +
-          '<p>I am a finance and accounting major from Lehigh University with a deep interest in artificial intelligence, history, and the stock market. I am currently interning for a venture capital firm focused on research and private investments, which has pushed me to think more seriously about how ideas become companies, how capital gets allocated, and how technology changes the way people make decisions.</p>' +
-          '<p>This site is a place for the projects I build on my own time. Some are more complete, some are lighter experiments, and some are just me following an idea far enough to see what it can become. The point is not to make every project sound bigger than it is. The point is to keep practicing, keep learning, and keep using AI and code to build things that interest me.</p>' +
+          '<p>I use these projects as a way to practice turning ideas into working products. AI helps me move from curiosity to execution faster: researching, writing, coding, debugging, and learning new concepts while the idea is still fresh. The point is simple: keep building, keep improving, and use AI as a tool to make things I actually care about.</p>' +
         '</section>' +
         '<section class="section split">' +
-          '<div class="entry"><p class="section-title">Why AI</p><h3>AI makes building feel wide open</h3><p>AI is incredible because it lowers the distance between having an idea and actually trying it. It helps with research, writing, coding, debugging, planning, and learning new concepts fast enough to keep momentum. Used well, it feels like a force multiplier: one person can explore more, build faster, and turn curiosity into something real.</p></div>' +
+          '<div class="entry"><p class="section-title">How I think about it</p><h3>Learning by building</h3><p>I am interested in projects that connect research, data, markets, history, and useful software. AlgoBall, History Heave, and Freedom Tell are different ideas, but they all come from the same place: picking something I am curious about and building far enough to understand it better.</p></div>' +
           '<div class="entry"><p class="section-title">Stack so far</p><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data. The stack will keep changing as the projects get better.</p></div>' +
         '</section>' +
         '</section>' +
