@@ -279,7 +279,7 @@ def _archive_section(archive: List[Dict[str, Any]]) -> str:
         '<label class="archive-picker-label" for="archive-date">Choose a day</label>'
         '<select class="archive-picker" id="archive-date">{options}</select>'
         "</div>"
-        '<p class="archive-note">Use this to look back by date. Saved live snapshots show book prices when available; older backfilled dates show historical model picks without archived sportsbook prices.</p>'
+        '<p class="archive-note">Choose any date to see that day\'s suggested bets and full slate. The current day is one morning pre-game snapshot, kept frozen for the full day; older backfilled dates show historical model picks without archived sportsbook prices.</p>'
         '<div id="archive-summary" class="archive-summary"></div>'
         '<div id="archive-results" class="archive-results"></div>'
         '<div id="archive-slate" class="archive-slate"></div>'
@@ -544,8 +544,6 @@ def render_html(context: dict) -> str:
         n_edges = 0
 
     edges = context.get("edges") or []
-    games = context.get("games") or []
-
     edge_word = "suggested bet" if n_edges == 1 else "suggested bets"
     game_word = "game" if n_games == 1 else "games"
 
@@ -554,7 +552,6 @@ def render_html(context: dict) -> str:
     tracker = context.get("tracker") or {}
     bankroll_html = _bankroll_section(tracker)
     tracker_html = _tracker_section(tracker)
-    games_html = _games_section(games)
 
     return (
         "<!DOCTYPE html>\n"
@@ -573,8 +570,8 @@ def render_html(context: dict) -> str:
         '<span class="brand">AlgoBall</span>\n'
         '<span class="brand-date">{date}</span>\n'
         "</div>\n"
-        '<div class="freshness">Pre-game snapshot - as of {generated_at}. '
-        "Frozen for the day.</div>\n"
+        '<div class="freshness">Daily pre-game snapshot - as of {generated_at}. '
+        "Frozen until tomorrow's morning refresh.</div>\n"
         '<div class="counts">{n_games} {game_word} &middot; '
         '{n_edges} {edge_word}</div>\n'
         '<p class="about">{about}</p>\n'
@@ -585,7 +582,6 @@ def render_html(context: dict) -> str:
         "{bankroll_html}\n"
         "{archive_html}\n"
         "{tracker_html}\n"
-        "{games_html}\n"
         '<footer class="site-footer">'
         "AlgoBall &middot; model-vs-market, measured. Not financial advice."
         '<span class="footer-contact">'
@@ -615,7 +611,6 @@ def render_html(context: dict) -> str:
         bankroll_html=bankroll_html,
         archive_html=archive_html,
         tracker_html=tracker_html,
-        games_html=games_html,
     )
 
 

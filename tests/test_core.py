@@ -28,6 +28,7 @@ from algoball.model.winprob import (
     win_probability,
     win_probability_from_runs,
 )
+from algoball.render.renderer import render_html
 
 
 # --- odds / de-vig -----------------------------------------------------------
@@ -136,3 +137,34 @@ def test_line_shopping_picks_best_price_and_flags_soft_book():
 def test_shop_lines_handles_empty():
     assert shop_lines([]) is None
 
+
+def test_renderer_uses_date_picker_for_full_slate_without_bottom_duplicate():
+    html = render_html({
+        "date": "2026-06-07",
+        "generated_at": "Jun 7, 2026, 10:30 AM ET",
+        "n_games": 1,
+        "n_edges": 0,
+        "edges": [],
+        "games": [{
+            "away": "New York Yankees",
+            "home": "Boston Red Sox",
+            "start_local": "7:10 PM ET",
+            "status": "no_edge",
+        }],
+        "archive": [{
+            "date": "2026-06-07",
+            "generated_at": "Jun 7, 2026, 10:30 AM ET",
+            "n_edges": 0,
+            "edges": [],
+            "games": [{
+                "away": "New York Yankees",
+                "home": "Boston Red Sox",
+                "start_local": "7:10 PM ET",
+                "status": "no_edge",
+            }],
+        }],
+        "tracker": {},
+    })
+    assert '<h2 class="section-title">Full Slate</h2>' not in html
+    assert "Choose any date to see that day's suggested bets and full slate" in html
+    assert "Frozen until tomorrow's morning refresh" in html

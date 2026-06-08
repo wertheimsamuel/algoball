@@ -185,20 +185,38 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
     print(f"[1] {date}: {len(todays)} games on the slate, {len(pregame)} still pre-game.")
 
     existing = load_snapshot(date)
-    if existing and existing.get("games") and len(pregame) < len(todays):
+    if existing and len(pregame) < len(todays):
         print(f"[1b] restoring saved full-day snapshot for {date}; games already started.")
         existing = hydrate_snapshot(date, existing)
         write_public_html(existing)
         return existing
 
     if not pregame:
+        games_ctx = []
+        for g in todays:
+            games_ctx.append({
+                "date": date,
+                "gamePk": g.get("gamePk"),
+                "away": g.get("away_name"),
+                "home": g.get("home_name"),
+                "start_local": _start_local(g.get("commence_utc")),
+                "model_prob": None,
+                "model_line": None,
+                "market_prob": None,
+                "edge_pct": None,
+                "status": "no_market",
+                "best_home_book": None,
+                "best_home_odds": None,
+                "best_away_book": None,
+                "best_away_odds": None,
+            })
         ctx = {
             "date": date,
             "generated_at": _now_stamp(),
-            "n_games": 0,
+            "n_games": len(games_ctx),
             "n_edges": 0,
             "edges": [],
-            "games": [],
+            "games": games_ctx,
             "tracker": build_tracker(int(date[:4])),
         }
         ctx["archive"] = _build_archive(date, ctx)
