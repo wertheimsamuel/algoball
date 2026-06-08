@@ -236,11 +236,28 @@ def _archive_payload(archive: List[Dict[str, Any]]) -> str:
                 "bestOdds": edge.get("best_odds"),
                 "source": edge.get("source") or day.get("source") or "live_snapshot",
             })
+        games = []
+        for game in day.get("games") or []:
+            games.append({
+                "away": game.get("away"),
+                "home": game.get("home"),
+                "startLocal": game.get("start_local"),
+                "modelProb": game.get("model_prob"),
+                "modelLine": game.get("model_line"),
+                "marketProb": game.get("market_prob"),
+                "edgePct": game.get("edge_pct"),
+                "status": game.get("status"),
+                "bestAwayBook": game.get("best_away_book"),
+                "bestAwayOdds": game.get("best_away_odds"),
+                "bestHomeBook": game.get("best_home_book"),
+                "bestHomeOdds": game.get("best_home_odds"),
+            })
         safe.append({
             "date": day.get("date"),
             "generatedAt": day.get("generated_at"),
             "nEdges": int(day.get("n_edges") or len(edges)),
             "edges": edges,
+            "games": games,
             "source": day.get("source") or "live_snapshot",
         })
     return json.dumps(safe, separators=(",", ":")).replace("</", "<\\/")
@@ -273,6 +290,7 @@ def _archive_section(archive: List[Dict[str, Any]]) -> str:
         '<p class="archive-note">Use this to look back by date. Saved live snapshots show book prices when available; older backfilled dates show historical model picks without archived sportsbook prices.</p>'
         '<div id="archive-summary" class="archive-summary"></div>'
         '<div id="archive-results" class="archive-results"></div>'
+        '<div id="archive-slate" class="archive-slate"></div>'
         '<script type="application/json" id="archive-data">{payload}</script>'
         "<script>{script}</script>"
         "</section>"
@@ -617,7 +635,8 @@ _ARCHIVE_SCRIPT = """
   var select = document.getElementById("archive-date");
   var summary = document.getElementById("archive-summary");
   var results = document.getElementById("archive-results");
-  if (!dataEl || !select || !summary || !results) return;
+  var slate = document.getElementById("archive-slate");
+  if (!dataEl || !select || !summary || !results || !slate) return;
 
   var days = [];
   try { days = JSON.parse(dataEl.textContent || "[]"); } catch (err) { days = []; }
@@ -649,6 +668,17 @@ _ARCHIVE_SCRIPT = """
     wrap.appendChild(textEl("strong", "", value));
     return wrap;
   }
+  function bestPrice(odds, book) {
+    var price = fmtOdds(odds);
+    return book ? price + " " + book : price;
+  }
+  function statusLabel(status) {
+    if (status === "surfaced") return "Edge";
+    if (status === "suppressed_bug") return "Suppressed (data)";
+    if (status === "suppressed_fragile") return "Suppressed (fragile)";
+    if (status === "no_market") return "No market";
+    return "No edge";
+  }
   function findDay(date) {
     for (var i = 0; i < days.length; i += 1) {
       if (days[i].date === date) return days[i];
@@ -658,6 +688,7 @@ _ARCHIVE_SCRIPT = """
   function render(date) {
     var day = findDay(date);
     results.innerHTML = "";
+    slate.innerHTML = "";
     if (!day) {
       summary.textContent = "No saved snapshots yet.";
       return;
@@ -672,25 +703,62 @@ _ARCHIVE_SCRIPT = """
       empty.appendChild(textEl("div", "empty-title", "No suggested bets on this day."));
       empty.appendChild(textEl("div", "empty-sub", "The model did not find a clear enough pre-game edge."));
       results.appendChild(empty);
+    } else {
+      day.edges.forEach(function (edge) {
+        var card = document.createElement("article");
+        card.className = "archive-card";
+        card.appendChild(textEl("div", "archive-date-line", (edge.startLocal || "Pre-game") + " · " + (edge.away || "") + " @ " + (edge.home || "")));
+        card.appendChild(textEl("div", "archive-pick", "Take " + (edge.sideTeam || "selected side") + " moneyline"));
+        var priceText = edge.bestOdds === null || edge.bestOdds === undefined
+          ? "Historical model pick · no archived book price"
+          : "Best available: " + fmtOdds(edge.bestOdds) + (edge.bestBook ? " " + edge.bestBook : "");
+        card.appendChild(textEl("div", "archive-price", priceText));
+        var grid = document.createElement("div");
+        grid.className = "archive-grid";
+        grid.appendChild(metric("Model", fmtPct(edge.modelProb) + " (" + fmtOdds(edge.modelLine) + ")"));
+        grid.appendChild(metric("Market", fmtPct(edge.marketProb)));
+        grid.appendChild(metric("Edge", fmtEdge(edge.edgePct)));
+        card.appendChild(grid);
+        results.appendChild(card);
+      });
+    }
+    var slateTitle = textEl("h3", "archive-slate-title", "Full slate for " + day.date);
+    slate.appendChild(slateTitle);
+    if (!day.games || !day.games.length) {
+      var missing = document.createElement("div");
+      missing.className = "empty-state small";
+      missing.appendChild(textEl("div", "empty-title", "Full slate unavailable for this backfilled day."));
+      missing.appendChild(textEl("div", "empty-sub", "Saved live snapshots include full-slate market data going forward."));
+      slate.appendChild(missing);
       return;
     }
-    day.edges.forEach(function (edge) {
-      var card = document.createElement("article");
-      card.className = "archive-card";
-      card.appendChild(textEl("div", "archive-date-line", (edge.startLocal || "Pre-game") + " · " + (edge.away || "") + " @ " + (edge.home || "")));
-      card.appendChild(textEl("div", "archive-pick", "Take " + (edge.sideTeam || "selected side") + " moneyline"));
-      var priceText = edge.bestOdds === null || edge.bestOdds === undefined
-        ? "Historical model pick · no archived book price"
-        : "Best available: " + fmtOdds(edge.bestOdds) + (edge.bestBook ? " " + edge.bestBook : "");
-      card.appendChild(textEl("div", "archive-price", priceText));
-      var grid = document.createElement("div");
-      grid.className = "archive-grid";
-      grid.appendChild(metric("Model", fmtPct(edge.modelProb) + " (" + fmtOdds(edge.modelLine) + ")"));
-      grid.appendChild(metric("Market", fmtPct(edge.marketProb)));
-      grid.appendChild(metric("Edge", fmtEdge(edge.edgePct)));
-      card.appendChild(grid);
-      results.appendChild(card);
+    var wrap = document.createElement("div");
+    wrap.className = "table-wrap compact";
+    var table = document.createElement("table");
+    table.className = "games-table archive-games-table";
+    table.innerHTML = "<thead><tr><th>Matchup</th><th class='num'>Model %</th><th class='num'>Market %</th><th class='num'>Edge</th><th>Status</th><th>Best away</th><th>Best home</th></tr></thead>";
+    var body = document.createElement("tbody");
+    day.games.forEach(function (game) {
+      var row = document.createElement("tr");
+      [
+        (game.away || "") + " @ " + (game.home || "") + (game.startLocal ? " · " + game.startLocal : ""),
+        fmtPct(game.modelProb),
+        fmtPct(game.marketProb),
+        fmtEdge(game.edgePct),
+        statusLabel(game.status),
+        bestPrice(game.bestAwayOdds, game.bestAwayBook),
+        bestPrice(game.bestHomeOdds, game.bestHomeBook)
+      ].forEach(function (value, index) {
+        var cell = document.createElement("td");
+        if (index === 1 || index === 2 || index === 3) cell.className = "num";
+        cell.textContent = value;
+        row.appendChild(cell);
+      });
+      body.appendChild(row);
     });
+    table.appendChild(body);
+    wrap.appendChild(table);
+    slate.appendChild(wrap);
   }
   select.addEventListener("change", function () { render(select.value); });
   render(select.value);
@@ -1053,6 +1121,17 @@ body {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
+}
+.archive-slate {
+  margin-top: 18px;
+}
+.archive-slate-title {
+  margin: 0 0 10px;
+  color: #c9d1d9;
+  font-size: 15px;
+}
+.archive-games-table {
+  min-width: 820px;
 }
 
 /* tracker */

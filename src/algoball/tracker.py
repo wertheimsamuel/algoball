@@ -170,13 +170,40 @@ def historical_daily_archive(start_year: int = 2023, end_year: Optional[int] = N
     """
     end_year = end_year or datetime.now().year
     days: Dict[str, List[dict]] = defaultdict(list)
+    day_games: Dict[str, List[dict]] = defaultdict(list)
     for season in range(start_year, end_year + 1):
         games = get_season_schedule(season)
         if not games:
             continue
         last_final = max(g["date"] for g in games if g.get("date"))
         end_date = last_final if season == end_year else None
-        for pick in _season_model_picks(season, end_date=end_date):
+        picks = _season_model_picks(season, end_date=end_date)
+        picks_by_game = {pick.get("gamePk"): pick for pick in picks}
+        for g in games:
+            date = g.get("date") or ""
+            if end_date and date > end_date:
+                continue
+            pick = picks_by_game.get(g.get("gamePk"))
+            model_prob = None
+            if pick:
+                model_prob = pick.get("pick_prob") if pick.get("side") == "home" else 1.0 - float(pick.get("pick_prob"))
+            day_games[date].append({
+                "date": date,
+                "gamePk": g.get("gamePk"),
+                "away": g.get("away_name"),
+                "home": g.get("home_name"),
+                "start_local": None,
+                "model_prob": model_prob,
+                "model_line": None,
+                "market_prob": None,
+                "edge_pct": (pick.get("edge_strength") or 0.0) * 100.0 if pick else None,
+                "status": "surfaced" if pick else "no_edge",
+                "best_away_book": None,
+                "best_away_odds": None,
+                "best_home_book": None,
+                "best_home_odds": None,
+            })
+        for pick in picks:
             days[pick["date"]].append({
                 "date": pick["date"],
                 "gamePk": pick.get("gamePk"),
@@ -199,6 +226,7 @@ def historical_daily_archive(start_year: int = 2023, end_year: Optional[int] = N
             "generated_at": "historical model backtest",
             "n_edges": len(edges),
             "edges": edges,
+            "games": day_games.get(date) or [],
             "source": "historical_model",
         })
     return sorted(out, key=lambda row: row["date"], reverse=True)

@@ -24,7 +24,7 @@ from .ingest.mlb import (
 )
 from .ingest.odds import get_mlb_moneylines
 from .ingest.teams import same_team
-from .model.calibrate import MAX_SURFACED_PER_DAY, Status, evaluate_game
+from .model.calibrate import Status, evaluate_game
 from .model.devig import (
     DevigResult,
     american_to_implied,
@@ -44,6 +44,37 @@ _UTC = ZoneInfo("UTC")
 # --- small helpers ----------------------------------------------------------
 def _data_dir() -> str:
     return os.environ.get("ALGOBALL_DATA_DIR") or os.path.join(_PROJECT_ROOT, "data")
+
+
+def snapshot_path(date: str) -> str:
+    return os.path.join(_data_dir(), f"{date}.json")
+
+
+def load_snapshot(date: str) -> Optional[dict]:
+    path = snapshot_path(date)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path) as f:
+            data = json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def write_public_html(ctx: dict) -> None:
+    public_dir = os.path.join(_PROJECT_ROOT, "public")
+    os.makedirs(public_dir, exist_ok=True)
+    with open(os.path.join(public_dir, "index.html"), "w") as f:
+        f.write(render_html(ctx))
+
+
+def hydrate_snapshot(date: str, ctx: dict) -> dict:
+    """Add current derived website sections to an older saved snapshot."""
+    hydrated = dict(ctx)
+    hydrated["tracker"] = build_tracker(int(date[:4]))
+    hydrated["archive"] = _build_archive(date, hydrated)
+    return hydrated
 
 
 def _et(dt_utc: datetime) -> datetime:
@@ -117,6 +148,13 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
     todays = get_todays_games(date)
     pregame = [g for g in todays if not g["started"]]
     print(f"[1] {date}: {len(todays)} games on the slate, {len(pregame)} still pre-game.")
+
+    existing = load_snapshot(date)
+    if existing and existing.get("games") and len(pregame) < len(todays):
+        print(f"[1b] restoring saved full-day snapshot for {date}; games already started.")
+        existing = hydrate_snapshot(date, existing)
+        write_public_html(existing)
+        return existing
 
     if not pregame:
         ctx = {
@@ -236,16 +274,10 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
                     "note": verdict.reasons[0],
                 })
 
-    # 6) Honest policy: a simple free model diverges from the sharper market on
-    # most games (that is model noise, not 15 edges). Surface ONLY the few largest
-    # divergences (MAX_SURFACED_PER_DAY) as a watchlist; demote the rest to no_edge.
+    # 6) Surface every game that passes the model's guardrails. The guards still
+    # suppress absurd outputs; we no longer apply an arbitrary top-3 display cap.
     diverged_count = len(edges_ctx)
     edges_ctx.sort(key=lambda e: abs(e["edge_pct"]), reverse=True)
-    edges_ctx = edges_ctx[:MAX_SURFACED_PER_DAY]
-    kept = {e.get("gamePk") for e in edges_ctx}
-    for g in games_ctx:
-        if g["status"] == "surfaced" and g.get("gamePk") not in kept:
-            g["status"] = "no_edge"
 
     record_live_suggestions(date, edges_ctx)
     ctx = {
@@ -258,7 +290,7 @@ def run(date: Optional[str] = None, feature_season: Optional[int] = None,
     ctx["archive"] = _build_archive(date, ctx)
     _write_outputs(date, ctx)
     print(f"[5] {len(games_ctx)} games | model diverged >floor on {diverged_count} | "
-          f"showing top {len(edges_ctx)} as watchlist.")
+          f"showing {len(edges_ctx)} supported suggested bets.")
     return ctx
 
 
@@ -268,6 +300,7 @@ def _archive_day(snapshot: dict) -> dict:
         "generated_at": snapshot.get("generated_at"),
         "n_edges": int(snapshot.get("n_edges") or 0),
         "edges": snapshot.get("edges") or [],
+        "games": snapshot.get("games") or [],
         "source": snapshot.get("source") or "live_snapshot",
     }
 
@@ -299,11 +332,8 @@ def _build_archive(current_date: str, current_ctx: dict) -> List[dict]:
 
 
 def _write_outputs(date: str, ctx: dict) -> None:
-    public_dir = os.path.join(_PROJECT_ROOT, "public")
     data_dir = _data_dir()
-    os.makedirs(public_dir, exist_ok=True)
     os.makedirs(data_dir, exist_ok=True)
-    with open(os.path.join(public_dir, "index.html"), "w") as f:
-        f.write(render_html(ctx))
-    with open(os.path.join(data_dir, f"{date}.json"), "w") as f:
+    write_public_html(ctx)
+    with open(snapshot_path(date), "w") as f:
         json.dump(ctx, f, indent=2)

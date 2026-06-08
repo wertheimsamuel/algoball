@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Optional
 from zoneinfo import ZoneInfo
 
-from .pipeline import run
+from .pipeline import hydrate_snapshot, load_snapshot, run, write_public_html
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PUBLIC_DIR = PROJECT_ROOT / "public"
@@ -56,6 +56,18 @@ def _write_error_page(exc: BaseException) -> None:
 
 def refresh_dashboard(*, refresh_odds: bool = False) -> None:
     try:
+        today = datetime.now(NY).strftime("%Y-%m-%d")
+        if not refresh_odds:
+            existing = load_snapshot(today)
+            if existing:
+                existing = hydrate_snapshot(today, existing)
+                write_public_html(existing)
+                print(
+                    f"[server] restored saved {today} snapshot: "
+                    f"{existing.get('n_games', 0)} games, {existing.get('n_edges', 0)} edges",
+                    flush=True,
+                )
+                return
         ctx = run(refresh_odds=refresh_odds)
         print(
             f"[server] refreshed {ctx['date']}: {ctx['n_games']} games, "
