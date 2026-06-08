@@ -14,8 +14,6 @@ Decided band (docs/VERIFICATION.md section C):
     METHOD_GAP_MAX       = 0.01          de-vig fragility guard (lopsided lines)
     SHRINK_W             = 0.0           model weight in the final blend (~0 until proven)
     PROB_CLAMP           = (0.15, 0.85)  backstop clamp on the final blended prob
-    MAX_SURFACED_PER_DAY = 3             sanity cap on how many games can surface
-
 Why these specifically:
   - A correctly-calibrated MLB win prob essentially never exceeds ~0.72-0.74,
     so the 0.80 hard ceiling never suppresses a legitimate read yet catches the
@@ -43,7 +41,6 @@ EDGE_FLOOR = 0.015
 METHOD_GAP_MAX = 0.01
 SHRINK_W = 0.0
 PROB_CLAMP = (0.15, 0.85)
-MAX_SURFACED_PER_DAY = 3
 
 
 class Status(str, Enum):

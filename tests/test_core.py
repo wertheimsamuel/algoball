@@ -6,10 +6,13 @@ suppressed. If a future change ever lets it through, this test fails.
 """
 from __future__ import annotations
 
+import json
 import math
 
 import pytest
 
+from algoball import pipeline
+from algoball import tracker
 from algoball.model.calibrate import (
     EDGE_FLOOR,
     MAX_RAW_DIVERGENCE,
@@ -168,3 +171,105 @@ def test_renderer_uses_date_picker_for_full_slate_without_bottom_duplicate():
     assert '<h2 class="section-title">Full Slate</h2>' not in html
     assert "Choose any date to see that day's suggested bets and full slate" in html
     assert "Frozen until tomorrow's morning refresh" in html
+
+
+def test_historical_model_picks_are_not_capped_at_three(monkeypatch):
+    games = []
+    for idx in range(5):
+        games.append({
+            "date": "2026-04-01",
+            "gamePk": 1000 + idx,
+            "home_id": idx + 1,
+            "away_id": idx + 101,
+            "home_name": f"Home {idx}",
+            "away_name": f"Away {idx}",
+            "home_won": True,
+        })
+
+    probs_by_home_rs = {
+        1.0: 0.60,
+        2.0: 0.58,
+        3.0: 0.56,
+        4.0: 0.54,
+        5.0: 0.52,
+    }
+
+    monkeypatch.setattr(tracker, "get_season_schedule", lambda season: games)
+    monkeypatch.setattr(tracker, "get_team_runs_per_game", lambda tid, season: float(tid) if tid < 100 else 4.0)
+    monkeypatch.setattr(tracker, "get_team_runs_allowed_per_game", lambda tid, season: 4.0)
+    monkeypatch.setattr(
+        tracker,
+        "prior_winprob",
+        lambda home_rs, home_ra, away_rs, away_ra: probs_by_home_rs[home_rs],
+    )
+
+    tracker._season_model_picks.cache_clear()
+    try:
+        picks = tracker._season_model_picks(2026)
+    finally:
+        tracker._season_model_picks.cache_clear()
+
+    assert len(picks) == 5
+    assert all(p["edge_strength"] >= EDGE_FLOOR for p in picks)
+
+
+def test_archive_payload_preserves_more_than_three_edges():
+    edges = []
+    games = []
+    for idx in range(5):
+        edges.append({
+            "date": "2026-04-01",
+            "gamePk": 2000 + idx,
+            "away": f"Away {idx}",
+            "home": f"Home {idx}",
+            "side": "home",
+            "model_prob": 0.55 + idx * 0.01,
+            "edge_pct": 5.0 + idx,
+        })
+        games.append({
+            "date": "2026-04-01",
+            "gamePk": 2000 + idx,
+            "away": f"Away {idx}",
+            "home": f"Home {idx}",
+            "status": "surfaced",
+        })
+
+    html = render_html({
+        "date": "2026-04-01",
+        "generated_at": "Apr 1, 2026, 10:30 AM ET",
+        "n_games": 5,
+        "n_edges": 5,
+        "edges": edges,
+        "games": games,
+        "archive": [{
+            "date": "2026-04-01",
+            "generated_at": "Apr 1, 2026, 10:30 AM ET",
+            "n_edges": 5,
+            "edges": edges,
+            "games": games,
+        }],
+        "tracker": {},
+    })
+    payload_text = html.split('id="archive-data">', 1)[1].split("</script>", 1)[0]
+    payload = json.loads(payload_text)
+
+    assert "2026-04-01 - 5 picks" in html
+    assert payload[0]["nEdges"] == 5
+    assert len(payload[0]["edges"]) == 5
+    assert len({edge["home"] for edge in payload[0]["edges"]}) == 5
+
+
+def test_archive_day_preserves_all_snapshot_edges():
+    snapshot = {
+        "date": "2026-04-01",
+        "generated_at": "Apr 1, 2026, 10:30 AM ET",
+        "n_edges": 5,
+        "edges": [{"gamePk": 3000 + idx} for idx in range(5)],
+        "games": [{"gamePk": 3000 + idx} for idx in range(5)],
+    }
+
+    archived = pipeline._archive_day(snapshot)
+
+    assert archived["n_edges"] == 5
+    assert len(archived["edges"]) == 5
+    assert len(archived["games"]) == 5

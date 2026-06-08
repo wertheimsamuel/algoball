@@ -411,7 +411,7 @@ def _tracker_section(tracker: Dict[str, Any]) -> str:
         '<section class="section tracker-section">'
         '<h2 class="section-title">Performance Tracker</h2>'
         '<div class="tracker-box">'
-        '<p class="tracker-note">Historical table uses the fast team-strength model back to 2023 and grades the top daily model picks against final MLB results. It does not claim historical Vegas edge because v1 does not include a paid historical odds feed.</p>'
+        '<p class="tracker-note">Historical table uses the fast team-strength model back to 2023 and grades every model-qualified daily lean against final MLB results. It does not claim historical Vegas edge because v1 does not include a paid historical odds feed.</p>'
         "{history_html}"
         "</div>"
         "</section>"

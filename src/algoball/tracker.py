@@ -3,9 +3,9 @@
 Two different records are intentionally kept separate:
 
 * live tracked suggestions: actual site suggestions from saved daily snapshots;
-* historical model-pick backtest: top model picks by day using MLB results, with
-  no historical sportsbook odds claim because we do not have a historical odds
-  feed in v1.
+* historical model-pick backtest: every model-qualified lean by day using MLB
+  results, with no historical sportsbook odds claim because we do not have a
+  historical odds feed in v1.
 """
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from .ingest.mlb import (
     get_team_runs_per_game,
 )
 from .ingest.teams import same_team
-from .model.calibrate import MAX_SURFACED_PER_DAY
+from .model.calibrate import EDGE_FLOOR
 from .model.strength import prior_winprob
 
 _PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -73,11 +73,13 @@ def _profit_for_american_odds(odds: Optional[float], stake: float, won: Optional
 
 @lru_cache(maxsize=None)
 def _season_model_picks(season: int, end_date: Optional[str] = None) -> Tuple[dict, ...]:
-    """Top model picks per date, graded against final scores.
+    """Model-qualified picks per date, graded against final scores.
 
     This is a no-odds historical backtest. For each date, rank games by the
-    model's distance from 50/50 and keep the same max-picks-per-day cap used by
-    the live site.
+    model's distance from 50/50 and keep every game that clears the same
+    minimum edge floor used by the live guardrails. There is intentionally no
+    top-N cap here; otherwise the archive misleadingly shows exactly three
+    picks almost every day.
     """
     feature_season = season - 1
     games = get_season_schedule(season)
@@ -127,7 +129,7 @@ def _season_model_picks(season: int, end_date: Optional[str] = None) -> Tuple[di
     picks: List[dict] = []
     for date, day_games in sorted(by_date.items()):
         ranked = sorted(day_games, key=lambda r: r["edge_strength"], reverse=True)
-        picks.extend(ranked[:MAX_SURFACED_PER_DAY])
+        picks.extend(r for r in ranked if r["edge_strength"] >= EDGE_FLOOR)
     return tuple(picks)
 
 
