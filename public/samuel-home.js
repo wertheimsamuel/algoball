@@ -44,21 +44,18 @@
       "#sw-hub{background:#f8fafc;color:#111827;padding:84px 6vw 72px;min-height:72vh}",
       "#sw-hub *{box-sizing:border-box}",
       "#sw-hub .wrap{max-width:1080px;margin:0 auto}",
-      "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#2563eb;margin:0 0 18px}",
+      "#sw-hub .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#64748b;margin:0 0 18px}",
       "#sw-hub h1{font-family:Georgia,'Times New Roman',serif;font-size:18px;font-weight:600;line-height:1.4;margin:0 0 14px;letter-spacing:0;max-width:900px;color:#000}",
       "#sw-hub .lead{font-size:clamp(18px,2.1vw,24px);line-height:1.42;max-width:760px;margin:0 0 30px;color:#334155}",
-      "#sw-hub .welcome{max-width:840px;margin:0 0 34px;border-left:3px solid #2563eb;padding-left:20px}",
-      "#sw-hub .welcome p{font-size:18px;line-height:1.64;color:#334155;margin:0}",
+      "#sw-hub .welcome{max-width:880px;margin:0 0 34px}",
+      "#sw-hub .welcome p{font-size:18px;line-height:1.68;color:#334155;margin:0 0 15px}",
       "#sw-hub .links{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 42px}",
       "#sw-hub a.btn{border:1px solid #111827;color:#111827;text-decoration:none;padding:13px 17px;font-size:14px;font-weight:600;display:inline-flex}",
       "#sw-hub a.primary{background:#111827;color:#fff}",
-      "#sw-hub .tabs{display:flex;gap:8px;border-bottom:1px solid #dbe4ef;margin:0 0 12px}",
-      "#sw-hub .tab{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:#64748b;padding:14px 2px 12px;margin:0 22px 0 0;font:inherit;font-size:15px;font-weight:650;cursor:pointer}",
-      "#sw-hub .tab.active{color:#111827;border-bottom-color:#111827}",
-      "#sw-hub .panel{display:none}",
-      "#sw-hub .panel.active{display:block}",
       "#sw-hub .section{border-top:1px solid #dbe4ef;padding:26px 0}",
-      "#sw-hub .section-title{font-size:14px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;color:#2563eb}",
+      "#sw-hub .section-title{font-size:14px;letter-spacing:.12em;text-transform:uppercase;margin:0 0 18px;color:#64748b}",
+      "#sw-hub .stack-section .section-title{color:#16a34a}",
+      "#sw-hub .stack-section{margin-top:8px}",
       "#sw-hub .bio{max-width:900px}",
       "#sw-hub .bio p,#sw-hub li{font-size:16px;line-height:1.62;color:#334155}",
       "#sw-hub .bio p{margin:0 0 15px}",
@@ -70,13 +67,13 @@
       "#sw-hub .project.featured{border-top:0;padding-top:24px}",
       "#sw-hub .project h2{font-size:32px;line-height:1.05;margin:0 0 10px}",
       "#sw-hub .project p{font-size:16px;line-height:1.58;margin:0;color:#334155}",
-      "#sw-hub .project .note{margin-top:13px;color:#2563eb}",
+      "#sw-hub .project .note{margin-top:13px;color:#475569}",
       "#sw-hub .tags{display:flex;gap:8px;flex-wrap:wrap;align-content:flex-start}",
-      "#sw-hub .tag{border:1px solid #bfdbfe;padding:6px 9px;font-size:12px;color:#1e3a8a;background:#eff6ff}",
+      "#sw-hub .tag{border:1px solid #dbe4ef;padding:6px 9px;font-size:12px;color:#334155;background:#f1f5f9}",
       "#sw-hub .muted{color:#475569}",
       "#sw-hub .contact{border-top:1px solid #dbe4ef;margin-top:10px;padding-top:26px;font-size:15px;color:#334155}",
       "#sw-hub .contact a{color:#111827;text-decoration:underline;text-underline-offset:3px}",
-      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .split{grid-template-columns:1fr;gap:18px}#sw-hub .tabs{gap:0}#sw-hub .tab{margin-right:18px}}"
+      "@media(max-width:760px){#sw-hub{padding:62px 22px}#sw-hub .project,#sw-hub .split{grid-template-columns:1fr;gap:18px}}"
     ].join("");
     document.head.appendChild(style);
   }
@@ -97,26 +94,16 @@
       "afterbegin",
       '<section id="sw-hub"><div class="wrap">' +
         "<h1>Hello, I&rsquo;m Sam Wertheim.</h1>" +
-        '<div class="welcome"><p>I created this site to showcase the projects I am building with AI. I am a finance and accounting major at Lehigh University with interests in artificial intelligence, history, and the stock market, and I am currently interning for a venture capital firm focused on research and private investments. This site is not meant to make every project sound bigger than it is. Some ideas go deep, some stay lighter, but all of them are built on my own time because I enjoy learning by making things.</p></div>' +
+        '<div class="welcome">' +
+          '<p>I created this site to showcase the projects I am building with AI. I am a finance and accounting major at Lehigh University, with interests in artificial intelligence, history, and the stock market. I am also interning for a venture capital firm focused on research and private investments.</p>' +
+          '<p>These projects are personal. Some are deeper and more developed, while others are lighter experiments, but each one is a way for me to learn by making something real. AI has made it possible for me to research, write, code, debug, and test ideas much faster than I could on my own. This site is where I keep track of that process: what I am curious about, what I am building, and how I am improving over time.</p>' +
+        '</div>' +
         '<div class="links">' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
           '<a class="btn" href="mailto:wertheimsamuel12123@gmail.com">Email</a>' +
         "</div>" +
-        '<div class="tabs" role="tablist" aria-label="Site sections">' +
-          '<button class="tab active" type="button" data-tab="about" role="tab" aria-selected="true">About</button>' +
-          '<button class="tab" type="button" data-tab="projects" role="tab" aria-selected="false">Projects</button>' +
-        '</div>' +
-        '<section class="panel active" data-panel="about" role="tabpanel">' +
-        '<section class="section bio">' +
-          '<p class="section-title">About</p>' +
-          '<p>I use these projects as a way to practice turning ideas into working products. AI helps me move from curiosity to execution faster: researching, writing, coding, debugging, and learning new concepts while the idea is still fresh. The point is simple: keep building, keep improving, and use AI as a tool to make things I actually care about.</p>' +
-        '</section>' +
-        '<section class="section split">' +
-          '<div class="entry"><p class="section-title">How I think about it</p><h3>Learning by building</h3><p>I am interested in projects that connect research, data, markets, history, and useful software. AlgoBall, History Heave, and Freedom Tell are different ideas, but they all come from the same place: picking something I am curious about and building far enough to understand it better.</p></div>' +
-          '<div class="entry"><p class="section-title">Stack so far</p><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data. The stack will keep changing as the projects get better.</p></div>' +
-        '</section>' +
-        '</section>' +
-        '<section class="panel" data-panel="projects" role="tabpanel">' +
+        '<section class="section" aria-label="Projects">' +
+        '<p class="section-title">Projects</p>' +
         '<article class="project featured">' +
           "<div><h2>AlgoBall</h2>" +
           '<p>Daily MLB betting-market analysis. AlgoBall builds its own pre-game moneyline probabilities, removes sportsbook vig, compares model price against market price, and highlights only the clearest model-vs-market divergences before games start.</p>' +
@@ -142,22 +129,13 @@
           '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
+        '<section class="section stack-section">' +
+          '<p class="section-title">Stack so far</p>' +
+          '<div class="entry"><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data. The stack will keep changing as the projects get better.</p></div>' +
+        '</section>' +
         '<p class="contact">Contact: <a href="mailto:wertheimsamuel12123@gmail.com">wertheimsamuel12123@gmail.com</a> / <a href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>' +
       "</div></section>"
     );
-    document.querySelectorAll("#sw-hub .tab").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var target = button.getAttribute("data-tab");
-        document.querySelectorAll("#sw-hub .tab").forEach(function (tab) {
-          var active = tab === button;
-          tab.classList.toggle("active", active);
-          tab.setAttribute("aria-selected", active ? "true" : "false");
-        });
-        document.querySelectorAll("#sw-hub .panel").forEach(function (panel) {
-          panel.classList.toggle("active", panel.getAttribute("data-panel") === target);
-        });
-      });
-    });
   }
 
   ready(function () {
