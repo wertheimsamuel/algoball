@@ -72,8 +72,43 @@ def write_public_html(ctx: dict) -> None:
 def hydrate_snapshot(date: str, ctx: dict) -> dict:
     """Add current derived website sections to an older saved snapshot."""
     hydrated = dict(ctx)
+    hydrated = _fill_missing_schedule_games(date, hydrated)
     hydrated["tracker"] = build_tracker(int(date[:4]))
     hydrated["archive"] = _build_archive(date, hydrated)
+    return hydrated
+
+
+def _fill_missing_schedule_games(date: str, ctx: dict) -> dict:
+    """Keep the displayed full slate complete even if an older snapshot was partial."""
+    games = list(ctx.get("games") or [])
+    seen = {g.get("gamePk") for g in games if g.get("gamePk") is not None}
+    try:
+        scheduled = get_todays_games(date)
+    except Exception:  # noqa: BLE001 - snapshot hydration should not fail render
+        scheduled = []
+    for g in scheduled:
+        if g.get("gamePk") in seen:
+            continue
+        games.append({
+            "date": date,
+            "gamePk": g.get("gamePk"),
+            "away": g.get("away_name"),
+            "home": g.get("home_name"),
+            "start_local": _start_local(g.get("commence_utc")),
+            "model_prob": None,
+            "model_line": None,
+            "market_prob": None,
+            "edge_pct": None,
+            "status": "no_market",
+            "best_home_book": None,
+            "best_home_odds": None,
+            "best_away_book": None,
+            "best_away_odds": None,
+        })
+        seen.add(g.get("gamePk"))
+    hydrated = dict(ctx)
+    hydrated["games"] = games
+    hydrated["n_games"] = len(games)
     return hydrated
 
 
