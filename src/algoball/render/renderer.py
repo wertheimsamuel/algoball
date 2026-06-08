@@ -40,22 +40,14 @@ _RISK_NOTICE = (
 )
 
 _PERSONAL_NOTE = (
-    "This is an AI project of mine. Baseball has always been one of my favorite "
-    "sports because of how much lives inside every pitch: the numbers, the "
-    "mechanics, the timing, the pitch type, the spin, the velocity, and the tiny "
-    "margin between a perfect swing and a miss. A pitch can be a fastball, "
-    "slider, changeup, curveball, or knuckleball, moving anywhere from the mid-80s "
-    "to 100 mph, and the hitter still has to solve it in real time. Ballparks "
-    "matter too: field size, wall shape, weather, and elevation can all change "
-    "how a game plays, with Denver being the simple example where altitude can "
-    "help hitters. I also notice hitters can run hot and cold in streaks in a "
-    "way that feels more visible in baseball than in other sports. Stats like "
-    "slugging and OPS, and the Moneyball idea that numbers can reveal hidden "
-    "value, are what made me want to build an algorithm that tries to find edges "
-    "against the house. I never had the coding ability to do it at this level "
-    "before. AI gave me that ability. AlgoBall is the product of that: an "
-    "AI-assisted baseball model that creates its own pre-game odds and compares "
-    "them against the market."
+    "This is an AI project built around one of my favorite sports. Baseball is "
+    "a numbers-heavy game where every pitch, swing, ballpark, weather condition, "
+    "and hitter streak can change the outcome. A fastball, slider, changeup, or "
+    "curveball can arrive near 100 mph, and parks like Denver show how elevation "
+    "and field dimensions can tilt the game. Stats like slugging and OPS, along "
+    "with the Moneyball idea that numbers can reveal hidden value, made me want "
+    "to build a model that creates its own pre-game odds and compares them "
+    "against the market. AI gave me the ability to finally build it."
 )
 
 
