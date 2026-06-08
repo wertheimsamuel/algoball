@@ -126,6 +126,13 @@
           '<div class="tags"><span class="tag">OSINT</span><span class="tag">News</span><span class="tag">AI research</span><span class="tag">Open sources</span><span class="tag">Live project</span></div>' +
         "</article>" +
         '<article class="project">' +
+          '<div><h2>VacayAI</h2>' +
+          '<p>An AI vacation planner. VacayAI takes your dates, destination or region, and travel preferences, then builds a realistic day-by-day itinerary scored to your taste. It does not book the trip for you; it gives you organized flight, hotel, and activity links so you can book it yourself.</p>' +
+          '<p class="note">Built around preference scoring, itinerary structure, booking-link generation, and a simple Railway deployment.</p>' +
+          '<p style="margin-top:16px"><a class="btn" href="https://vacayai-production.up.railway.app/">View live project</a></p></div>' +
+          '<div class="tags"><span class="tag">AI planner</span><span class="tag">Travel</span><span class="tag">Python</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">Live project</span></div>' +
+        "</article>" +
+        '<article class="project">' +
           '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
