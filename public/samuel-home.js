@@ -140,12 +140,18 @@
           '<div class="tags"><span class="tag">AI planner</span><span class="tag">Travel</span><span class="tag">Python</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">Live project</span></div>' +
         "</article>" +
         '<article class="project">' +
+          '<div><h2>Basketball Whiteboard</h2>' +
+          '<p>A work-in-progress basketball strategy game. The idea is to make the player feel like a coach drawing on a whiteboard: control all five players from above, sketch movement paths, pass, shoot, and try to beat a reacting AI defense before the shot clock runs out.</p>' +
+          '<p class="note">Currently being built as a browser game with a vanilla JavaScript Canvas frontend, a lightweight Python server, all-time player ratings, scrimmage mode, and an early career-mode structure.</p></div>' +
+          '<div class="tags"><span class="tag">Work in progress</span><span class="tag">Basketball game</span><span class="tag">Canvas</span><span class="tag">Vanilla JS</span><span class="tag">Python</span><span class="tag">AI defense</span></div>' +
+        "</article>" +
+        '<article class="project">' +
           '<div><h2>What this site is for</h2><p class="muted">A public place to track what I am learning and building. When an idea becomes real, useful, or interesting enough to share, it belongs here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
         '<section class="section stack-section">' +
           '<p class="section-title">Stack so far</p>' +
-          '<div class="entry"><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing against real data. The stack will keep changing as the projects become more ambitious.</p></div>' +
+          '<div class="entry"><h3>Python, data, web, games, deployment</h3><p>Python, APIs, model logic, vanilla JavaScript, Canvas, browser-game mechanics, GitHub, Railway, static dashboards, lightweight web deployment, and testing against real data. The stack keeps changing as the projects become more ambitious.</p></div>' +
         '</section>' +
         '<p class="contact">Contact: <a href="mailto:wertheimsamuel12123@gmail.com">wertheimsamuel12123@gmail.com</a> / <a href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>' +
       "</div></section>"
