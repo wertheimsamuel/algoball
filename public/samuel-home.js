@@ -95,8 +95,8 @@
       '<section id="sw-hub"><div class="wrap">' +
         "<h1>Hello, I&rsquo;m Sam Wertheim.</h1>" +
         '<div class="welcome">' +
-          '<p>I created this site to showcase the projects I am building with AI. I am a finance and accounting major at Lehigh University, with interests in artificial intelligence, history, and the stock market. I am also interning for a venture capital firm focused on research and private investments.</p>' +
-          '<p>These projects are personal. Some are deeper and more developed, while others are lighter experiments, but each one is a way for me to learn by making something real. AI has made it possible for me to research, write, code, debug, and test ideas much faster than I could on my own. This site is where I keep track of that process: what I am curious about, what I am building, and how I am improving over time.</p>' +
+          '<p>I created this site to share the projects I am building with AI. I am a finance and accounting major at Lehigh University, with interests in artificial intelligence, history, and the stock market. I am currently interning at a venture capital firm focused on research and private investments.</p>' +
+          '<p>These projects are personal, but they are also practice: a way to turn curiosity into working products. Some are more developed than others, but each one helps me learn how to research, write, code, test, and explain ideas more clearly. This site is where I keep track of what I am building, what I am learning, and how I am improving over time.</p>' +
         '</div>' +
         '<div class="links">' +
           '<a class="btn" href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a>' +
@@ -106,39 +106,39 @@
         '<p class="section-title">Projects</p>' +
         '<article class="project featured">' +
           "<div><h2>AlgoBall</h2>" +
-          '<p>Daily MLB betting-market analysis. AlgoBall builds its own pre-game moneyline probabilities, removes sportsbook vig, compares model price against market price, and highlights only the clearest model-vs-market divergences before games start.</p>' +
-          '<p class="note">Built because baseball has deep public data, betting markets are hard to beat, and that makes the problem interesting.</p>' +
+          '<p>A daily MLB betting-market analysis project. AlgoBall builds its own pre-game moneyline probabilities, removes sportsbook vig, compares the model&rsquo;s price with the market price, and highlights model-vs-market divergences before games start.</p>' +
+          '<p class="note">Built because baseball has deep public data, and because efficient betting markets make the problem genuinely difficult and interesting.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://algoball.samuelwertheim.com/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">Python</span><span class="tag">MLB Stats API</span><span class="tag">Odds API</span><span class="tag">Railway</span><span class="tag">Daily refresh</span><span class="tag">Sports analytics</span></div>' +
         "</article>" +
         '<article class="project">' +
           '<div><h2>History Heave</h2>' +
-          '<p>A history dating game. You are shown a piece of history &mdash; a national flag or a ruler&rsquo;s portrait &mdash; and you &ldquo;heave&rdquo; a guess at when it is from by dragging a range of years. A tighter range scores more when you are right; the whole timeline scores nothing. Easy mode gives the name and context; Hard mode shows only the item.</p>' +
-          '<p class="note">Built on open data from Wikidata and Wikimedia Commons, every image license-checked. Same stack as AlgoBall: Python standard library, vanilla JavaScript, deployed on Railway.</p>' +
+          '<p>A history dating game. Players see a historical clue, such as a national flag or a ruler&rsquo;s portrait, and guess when it is from by selecting a range of years. Narrower ranges score more when they are correct; broad guesses score less. Easy mode includes context, while Hard mode shows only the item.</p>' +
+          '<p class="note">Built with open data from Wikidata and Wikimedia Commons, with image licensing checked before use.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://history-heave-production.up.railway.app/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">Python</span><span class="tag">Wikidata</span><span class="tag">Wikimedia Commons</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">History game</span></div>' +
         "</article>" +
         '<article class="project">' +
           '<div><h2>Freedom Tell</h2>' +
-          '<p>An open-source intelligence news project. Freedom Tell is built around tracking public information, organizing signals from open sources, and turning scattered news and research into something easier to follow and understand.</p>' +
-          '<p class="note">Built as a serious research/news direction: collecting public information, making sense of it, and presenting it clearly.</p>' +
+          '<p>An open-source intelligence news project. Freedom Tell tracks public information, organizes signals from open sources, and turns scattered news and research into a clearer way to follow developing stories.</p>' +
+          '<p class="note">Built as a research-focused news tool: collect public information, make sense of it, and present it clearly.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://freedomtell-production.up.railway.app/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">OSINT</span><span class="tag">News</span><span class="tag">AI research</span><span class="tag">Open sources</span><span class="tag">Live project</span></div>' +
         "</article>" +
         '<article class="project">' +
           '<div><h2>VacayAI</h2>' +
-          '<p>An AI vacation planner. VacayAI takes your dates, destination or region, and travel preferences, then builds a realistic day-by-day itinerary scored to your taste. It does not book the trip for you; it gives you organized flight, hotel, and activity links so you can book it yourself.</p>' +
+          '<p>An AI vacation planner. VacayAI takes dates, a destination or region, and travel preferences, then builds a realistic day-by-day itinerary scored to the user&rsquo;s taste. It does not book the trip; it organizes flight, hotel, and activity links so the user can book independently.</p>' +
           '<p class="note">Built around preference scoring, itinerary structure, booking-link generation, and a simple Railway deployment.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://vacayai-production.up.railway.app/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">AI planner</span><span class="tag">Travel</span><span class="tag">Python</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">Live project</span></div>' +
         "</article>" +
         '<article class="project">' +
-          '<div><h2>What this site is for</h2><p class="muted">A public place to keep track of what I am learning and building. If something becomes real, useful, or interesting, it gets added here.</p></div>' +
+          '<div><h2>What this site is for</h2><p class="muted">A public place to track what I am learning and building. When an idea becomes real, useful, or interesting enough to share, it belongs here.</p></div>' +
           '<div class="tags"><span class="tag">Experiments</span><span class="tag">Learning by building</span><span class="tag">Personal projects</span></div>' +
         '</article></section>' +
         '<section class="section stack-section">' +
           '<p class="section-title">Stack so far</p>' +
-          '<div class="entry"><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing ideas against real data. The stack will keep changing as the projects get better.</p></div>' +
+          '<div class="entry"><h3>Python, data, web, deployment</h3><p>Python, APIs, model logic, GitHub, Railway, static dashboards, lightweight web deployment, and testing against real data. The stack will keep changing as the projects become more ambitious.</p></div>' +
         '</section>' +
         '<p class="contact">Contact: <a href="mailto:wertheimsamuel12123@gmail.com">wertheimsamuel12123@gmail.com</a> / <a href="https://www.linkedin.com/in/samuel-wertheim/" target="_blank" rel="noopener noreferrer">LinkedIn</a></p>' +
       "</div></section>"
@@ -155,5 +155,15 @@
     addStyles();
     renderHub();
     hideNativeHeaderBrand();
+    var attempts = 0;
+    var timer = window.setInterval(function () {
+      attempts += 1;
+      removeStrayCodeText();
+      renderHub();
+      hideNativeHeaderBrand();
+      if (document.getElementById("sw-hub") || attempts >= 20) {
+        window.clearInterval(timer);
+      }
+    }, 250);
   });
 }());
