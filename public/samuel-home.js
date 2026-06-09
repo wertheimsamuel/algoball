@@ -95,7 +95,7 @@
       '<section id="sw-hub"><div class="wrap">' +
         "<h1>Hello, I&rsquo;m Sam Wertheim.</h1>" +
         '<div class="welcome">' +
-          '<p>I created this site to share the projects I am building with AI. I am a finance and accounting major at Lehigh University, with interests in artificial intelligence, history, and the stock market. I am currently interning at a venture capital firm focused on research and private investments.</p>' +
+          '<p>I created this site to share the projects I am building with AI. I am a finance and accounting major at Lehigh University, with interests in artificial intelligence, history, and the stock market. I am currently interning at a venture capital firm focused on research and private investments, with an emphasis on deep technology.</p>' +
           '<p>These projects are personal, but they are also practice: a way to turn curiosity into working products. Some are more developed than others, but each one helps me learn how to research, write, code, test, and explain ideas more clearly. This site is where I keep track of what I am building, what I am learning, and how I am improving over time.</p>' +
         '</div>' +
         '<div class="links">' +
