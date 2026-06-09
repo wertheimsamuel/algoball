@@ -113,10 +113,17 @@
         "</article>" +
         '<article class="project">' +
           '<div><h2>History Heave</h2>' +
-          '<p>A history dating game. Players see a historical clue, such as a national flag or a ruler&rsquo;s portrait, and guess when it is from by selecting a range of years. Narrower ranges score more when they are correct; broad guesses score less. Easy mode includes context, while Hard mode shows only the item.</p>' +
-          '<p class="note">Built with open data from Wikidata and Wikimedia Commons, with image licensing checked before use.</p>' +
+          '<p>A history dating game. Players see a historical clue, such as a ruler, weapon, battle, map scenario, building, or invention, and guess when it is from by selecting a range of years. Narrower ranges score more when they are correct; broad guesses score less.</p>' +
+          '<p class="note">Built with open historical data, curated date ranges, and image licensing checked before use.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://history-heave-production.up.railway.app/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">Python</span><span class="tag">Wikidata</span><span class="tag">Wikimedia Commons</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">History game</span></div>' +
+        "</article>" +
+        '<article class="project">' +
+          '<div><h2>Hindsight Bias</h2>' +
+          '<p>A history decision game about the &ldquo;I knew it all along&rdquo; effect. Each round drops the player into a real historical decision with only the context people had at the time, then reveals what actually happened and why the obvious answer was not obvious in the moment.</p>' +
+          '<p class="note">Built with spoiler-free scenarios, server-side answer grading, neutral sourcing, and a vanilla JavaScript frontend deployed on Railway.</p>' +
+          '<p style="margin-top:16px"><a class="btn" href="https://hindsight-bias-production.up.railway.app/">View live project</a></p></div>' +
+          '<div class="tags"><span class="tag">History game</span><span class="tag">Decision-making</span><span class="tag">Python</span><span class="tag">Vanilla JS</span><span class="tag">Railway</span><span class="tag">Live project</span></div>' +
         "</article>" +
         '<article class="project">' +
           '<div><h2>Freedom Tell</h2>' +
