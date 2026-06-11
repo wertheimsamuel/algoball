@@ -141,7 +141,7 @@
         "</article>" +
         '<article class="project">' +
           '<div><h2>Basketball Whiteboard</h2>' +
-          '<p>A work-in-progress basketball strategy game. The idea is to make the player feel like a coach drawing on a whiteboard: control all five players from above, sketch movement paths, pass, shoot, and try to beat a reacting AI defense before the shot clock runs out.</p>' +
+          '<p>A basketball strategy game built around the feeling of coaching on a whiteboard: control all five players from above, sketch movement paths, pass, shoot, and try to beat a reacting AI defense before the shot clock runs out.</p>' +
           '<p class="note">Built as a browser game with a vanilla JavaScript Canvas frontend, a lightweight Python server, all-time player ratings, scrimmage mode, and an early career-mode structure.</p>' +
           '<p style="margin-top:16px"><a class="btn" href="https://basketball-whiteboard-production.up.railway.app/">View live project</a></p></div>' +
           '<div class="tags"><span class="tag">Live project</span><span class="tag">Basketball game</span><span class="tag">Canvas</span><span class="tag">Vanilla JS</span><span class="tag">Python</span><span class="tag">AI defense</span></div>' +
